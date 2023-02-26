@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { OrderModule } from './orders-module/orders.module';
-import { SaleModule } from './sales-module/sales.module';
+import { OrderModule } from './orders/orders.module';
+import { SaleModule } from './sales/sales.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { Config } from './config/config.keys';
