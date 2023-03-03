@@ -1,22 +1,15 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Post,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
 import { Customer } from '../repository/schemas/customer.schema';
 import { CustomerDTO } from '../dtos/customer.dto';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
 import { CustomerService } from '../services/customer.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ExecutionCtx } from 'src/auth/decorators/execution-ctx.decorator';
+import { Context } from 'src/auth/context/execution-ctx';
 
-@Controller({
-  path: 'customers',
-})
+@UseGuards(AuthGuard)
+@Controller('customers')
 export class CustomerController {
   constructor(private customerService: CustomerService) {}
 
@@ -25,8 +18,8 @@ export class CustomerController {
    */
 
   @Post()
-  async create(@Body() customer: CustomerDTO): Promise<Customer> {
-    return this.customerService.create(customer);
+  async create(@ExecutionCtx() executionCtx: Context, @Body() customer: CustomerDTO): Promise<Customer> {
+    return this.customerService.create(executionCtx, customer);
   }
 
   @Get('/:customerId')
@@ -35,22 +28,24 @@ export class CustomerController {
   }
 
   @Get()
-  async findAll(
-    @Query() { skip, limit, keyValue }: PaginationParamsDTO,
-  ): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
     return this.customerService.findAll(keyValue, skip, limit);
   }
 
   @Patch('/:customerId')
   async update(
+    @ExecutionCtx() executionCtx: Context,
     @Body() customer: Partial<Customer>,
     @Param('customerId') customerId: string,
   ): Promise<Customer> {
-    return this.customerService.update(customer, customerId);
+    return this.customerService.update(executionCtx, customer, customerId);
   }
 
   @Delete('/:customerId')
-  async delete(@Param('customerId') customerId: string): Promise<Customer> {
-    return this.customerService.delete(customerId);
+  async delete(
+    @ExecutionCtx() executionCtx: Context,
+    @Param('customerId') customerId: string,
+  ): Promise<Customer> {
+    return this.customerService.delete(executionCtx, customerId);
   }
 }

@@ -3,16 +3,32 @@ import { OrderModule } from './orders/orders.module';
 import { SaleModule } from './sales/sales.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { Config } from './config/config.keys';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
-  imports: [ConfigModule, OrderModule, SaleModule],
+  imports: [
+    ConfigModule,
+    OrderModule,
+    SaleModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            singleLine: true,
+            messageKey: 'message',
+          },
+        },
+        messageKey: 'message',
+      },
+    }),
+  ],
   providers: [ConfigService],
 })
 export class AppModule {
   static port: number | string;
 
-  constructor(private readonly configService: ConfigService) {
-    AppModule.port = this.configService.get(Config.PORT);
+  constructor(private readonly config: ConfigService) {
+    AppModule.port = this.config.get('PORT');
   }
 }
