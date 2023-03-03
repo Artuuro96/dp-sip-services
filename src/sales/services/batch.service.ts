@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { BatchRepository } from '../repository/repositories/batch.repository';
 import { LandRepository } from '../repository/repositories/land.repository';
 import { LandService } from './land.service';
@@ -10,6 +6,7 @@ import { Batch } from '../repository/schemas/batch.schema';
 import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
 import { BatchDTO } from '../dtos/batch.dto';
 import { isNil } from 'lodash';
+import { Context } from 'src/auth/context/execution-ctx';
 
 @Injectable()
 export class BatchService {
@@ -25,15 +22,15 @@ export class BatchService {
    * @description Creates a batch
    * @returns {Object} Returns the batch
    */
-  async create(batch: BatchDTO): Promise<Batch> {
+  async create(executionCtx: Context, batch: BatchDTO): Promise<Batch> {
     const newBatch: Batch = {
       ...batch,
-      createdBy: '63d8b7c773867f515b7b8adb', //Until we know how to get the batchID
+      createdBy: executionCtx.userId,
     };
 
     const batchCreated = await this.batchRepository.create(newBatch);
     if (!isNil(batchCreated.landIds)) {
-      await this.updateLand(batchCreated._id, batchCreated.landIds);
+      await this.updateLand(executionCtx, batchCreated._id, batchCreated.landIds);
     }
 
     return batchCreated;
@@ -60,11 +57,7 @@ export class BatchService {
    * @description Find all the batch paginated
    * @returns {PaginateResult} Object with the batch paginate
    */
-  async findAll(
-    keyValue = '',
-    skip = 0,
-    limit?: number,
-  ): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {
@@ -93,7 +86,7 @@ export class BatchService {
    * @description Update the batch
    * @returns {Object} Returns the batch updated
    */
-  async update(batch, batchId): Promise<Batch> {
+  async update(executionCtx: Context, batch, batchId): Promise<Batch> {
     const batchFound = await this.batchRepository.findById(batchId, {
       _id: 1,
       deleted: 1,
@@ -105,7 +98,7 @@ export class BatchService {
     batch.Id = batchId;
     const batchUpdated = await this.batchRepository.updateOne(batch);
     if (!isNil(batchUpdated.landIds)) {
-      await this.updateLand(batchFound._id, batchUpdated.landIds);
+      await this.updateLand(executionCtx, batchFound._id, batchUpdated.landIds);
     }
 
     return batchUpdated;
@@ -117,7 +110,7 @@ export class BatchService {
    * @description Deletes the batch but not remove from the DB
    * @returns {Object} Returns the result from the deletion
    */
-  async delete(batchId): Promise<Batch> {
+  async delete(executionCtx: Context, batchId): Promise<Batch> {
     const batch = await this.batchRepository.findById(batchId, {
       _id: 1,
       deleted: 1,
@@ -129,12 +122,13 @@ export class BatchService {
 
     if (!isNil(batch.landIds)) {
       batch.landIds.forEach((landId) => {
-        this.landService.delete(landId);
+        this.landService.delete(executionCtx, landId);
       });
     }
 
     batch.deleted = true;
     batch.landIds = [];
+    batch.updatedBy = executionCtx.userId;
     return this.batchRepository.updateOne(batch);
   }
 
@@ -145,7 +139,7 @@ export class BatchService {
    * @description Update the land and his respective batches
    * @returns
    */
-  async updateLand(batchId, landIds: string[]): Promise<void> {
+  async updateLand(excutionCtx: Context, batchId, landIds: string[]): Promise<void> {
     const findOptiopns = {
       query: {
         Id: { $in: landIds },
@@ -160,12 +154,10 @@ export class BatchService {
 
     for (const land of landsFound) {
       if (!isNil(land.batchId)) {
-        await this.landService.deleteLandInBatch(
-          land.batchId,
-          land._id.toString(),
-        );
+        await this.landService.deleteLandInBatch(land.batchId, land._id.toString());
       }
       land.batchId = batchId;
+      land.updatedBy = excutionCtx.userId;
       await this.landRepository.updateOne(land);
     }
     return;

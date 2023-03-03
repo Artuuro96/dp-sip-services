@@ -2,6 +2,7 @@
   "singleQuote": true,
   "trailingComma": "all",
   "endOfLine": "auto",
+  "printWidth": 110,
   "prettier/prettier": [
     "error",
     {

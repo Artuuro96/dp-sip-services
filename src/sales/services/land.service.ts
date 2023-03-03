@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { BatchRepository } from '../repository/repositories/batch.repository';
 import { LandRepository } from '../repository/repositories/land.repository';
 import { Address, Land } from '../repository/schemas/land.schema';
@@ -10,13 +6,11 @@ import { PaginateResult } from '../repository/interfaces/paginate-result.interfa
 import { LandDTO } from '../dtos/land.dto';
 import { isNil } from 'lodash';
 import { Batch } from '../repository/schemas/batch.schema';
+import { Context } from 'src/auth/context/execution-ctx';
 
 @Injectable()
 export class LandService {
-  constructor(
-    private landRepository: LandRepository,
-    private batchRepository: BatchRepository,
-  ) {}
+  constructor(private landRepository: LandRepository, private batchRepository: BatchRepository) {}
 
   /**
    * @name create
@@ -24,15 +18,12 @@ export class LandService {
    * @description Creates a land
    * @returns {Object} Returns the land
    */
-  async create(land: LandDTO): Promise<Land> {
+  async create(executionCtx: Context, land: LandDTO): Promise<Land> {
     const { address } = land;
 
     if (!isNil(land.batchId)) {
       const projection = { Id: 1, delete: 1 };
-      const batch: Batch = await this.batchRepository.findById(
-        land.batchId,
-        projection,
-      );
+      const batch: Batch = await this.batchRepository.findById(land.batchId, projection);
       if (isNil(batch)) throw new NotFoundException('Batch not found');
       if (batch.deleted) throw new NotFoundException('Batch not found');
     }
@@ -43,7 +34,7 @@ export class LandService {
     const newLand: Land = {
       ...land,
       address: newAddress,
-      createdBy: '63d8b7c773867f515b7b8adb', //Until we know how to get the LandID
+      createdBy: executionCtx.userId, //Until we know how to get the LandID
     };
 
     return this.landRepository.create(newLand);
@@ -70,11 +61,7 @@ export class LandService {
    * @description Find all the land paginated
    * @returns {PaginateResult} Object with the land paginate
    */
-  async findAll(
-    keyValue = '',
-    skip = 0,
-    limit?: number,
-  ): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {
@@ -103,7 +90,7 @@ export class LandService {
    * @description Update the land
    * @returns {Object} Returns the land updated
    */
-  async update(land, landId): Promise<Land> {
+  async update(exectionCtx: Context, land, landId: string): Promise<Land> {
     const landFound = await this.landRepository.findById(landId, {
       _id: 1,
       deleted: 1,
@@ -111,10 +98,7 @@ export class LandService {
 
     if (!isNil(land.batchId)) {
       const projection = { Id: 1, delete: 1 };
-      const batch: Batch = await this.batchRepository.findById(
-        land.batchId,
-        projection,
-      );
+      const batch: Batch = await this.batchRepository.findById(land.batchId, projection);
       if (isNil(batch)) throw new NotFoundException('Batch not found');
       if (batch.deleted) throw new NotFoundException('Batch not found');
     }
@@ -122,6 +106,7 @@ export class LandService {
     if (isNil(landFound)) throw new NotFoundException('Land not found');
     if (landFound.deleted) throw new NotFoundException('Land not found');
     land.Id = landId;
+    land.updatedBy = exectionCtx.userId;
     return this.landRepository.updateOne(land);
   }
 
@@ -131,7 +116,7 @@ export class LandService {
    * @description Deletes the land but not remove from the DB
    * @returns {Object} Returns the result from the deletion
    */
-  async delete(landId: string): Promise<Land> {
+  async delete(executionCtx: Context, landId: string): Promise<Land> {
     const land = await this.landRepository.findById(landId, {
       _id: 1,
       batchId: 1,
@@ -140,9 +125,9 @@ export class LandService {
     if (isNil(land)) throw new NotFoundException('Land not found');
     if (land.deleted) throw new BadRequestException('Land already deleted');
 
-    if (!isNil(land.batchId))
-      await this.deleteLandInBatch(land.batchId, landId);
+    if (!isNil(land.batchId)) await this.deleteLandInBatch(land.batchId, landId);
     land.deleted = true;
+    land.deletedBy = executionCtx.userId;
     return this.landRepository.updateOne(land);
   }
 
@@ -155,17 +140,12 @@ export class LandService {
    */
   async deleteLandInBatch(batchId: string, landId: string): Promise<Batch> {
     const projection = { Id: 1, delete: 1, landIds: 1 };
-    const batch: Batch = await this.batchRepository.findById(
-      batchId,
-      projection,
-    );
+    const batch: Batch = await this.batchRepository.findById(batchId, projection);
 
     if (isNil(batch)) throw new NotFoundException('Batch not found');
     if (batch.deleted) throw new NotFoundException('Batch not found');
-    if (isNil(batch.landIds))
-      throw new BadRequestException('Land does not exist in batch');
-    if (!batch.landIds.includes(landId))
-      throw new BadRequestException('Land does not exist in batch');
+    if (isNil(batch.landIds)) throw new BadRequestException('Land does not exist in batch');
+    if (!batch.landIds.includes(landId)) throw new BadRequestException('Land does not exist in batch');
 
     const newLandsArray = batch.landIds.filter((item) => item !== landId);
 
