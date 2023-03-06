@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsArray,
-  IsNotEmpty,
-  IsOptional,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsArray, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class BatchDTO {
   @IsString()
@@ -12,7 +6,7 @@ export class BatchDTO {
   name: string;
 
   @IsArray()
-  @IsNotEmpty()
+  @IsOptional()
   landIds?: string[];
 
   @IsString()
@@ -25,5 +19,5 @@ export class BatchDTO {
 
   @IsNumber()
   @IsOptional()
-  total_size?: number;
+  totalSize?: number;
 }

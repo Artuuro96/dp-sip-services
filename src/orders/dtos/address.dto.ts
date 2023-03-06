@@ -1,5 +1,4 @@
-import {  IsString,  IsOptional, IsNotEmpty, IsNumber } from 'class-validator';
-
+import { IsString, IsOptional, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class AddressDTO {
   @IsString()

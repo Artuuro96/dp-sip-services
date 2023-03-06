@@ -1,5 +1,5 @@
 export enum CreditStatusEnum {
-  PENDING,
-  APPROVED,
-  REJECTED,
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
 }

@@ -1,5 +1,4 @@
 export enum TermTypeEnum {
-  PENDING,
-  FINISHED,
-  CANCELLED,
+  WEEKLY = 'weekly',
+  MONThLY = 'monthly',
 }

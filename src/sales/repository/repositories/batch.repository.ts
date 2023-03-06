@@ -4,9 +4,7 @@ import { isNil } from 'lodash';
 import { Batch, BatchDocument } from '../schemas/batch.schema';
 
 export class BatchRepository {
-  constructor(
-    @InjectModel(Batch.name) private batchModel: Model<BatchDocument>,
-  ) {}
+  constructor(@InjectModel(Batch.name) private batchModel: Model<BatchDocument>) {}
   async create(batch: Batch): Promise<Batch> {
     return this.batchModel.create(batch);
   }

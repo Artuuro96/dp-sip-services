@@ -9,8 +9,8 @@ import { CustomerService } from './customer.service';
 describe('CustomerService', () => {
   let customerService: CustomerService;
   let mockCustomers: Partial<Customer[]>;
-  let mockUpdatedCustomer: Partial<Customer>
-  let mockDeletedCustomer: Partial<Customer>
+  let mockUpdatedCustomer: Partial<Customer>;
+  let mockDeletedCustomer: Partial<Customer>;
   let mockCustomerDTO: CustomerDTO;
   let mockCustomerDeleted: Partial<Customer>;
 
@@ -21,129 +21,129 @@ describe('CustomerService', () => {
       providers: [
         CustomerService,
         CustomerRepository,
-        { provide:getModelToken(Customer.name), useClass: Customer },
+        { provide: getModelToken(Customer.name), useClass: Customer },
       ],
-    })
-      .compile();
+    }).compile();
 
     mockCustomerDTO = {
-      name:"Arturo",
-        lastName:"Rodriguez",
-        secondLastName:"Olvera",
-        email:"arturo.rodriguez@gmail.com",
-        "cellPhone": 5541588339,
-        "phone": 5541588339,
-        rfc:"ARO960",
-        "address": {
-            country: "Mexico",
-            state: "Estado de Mexico",
-            city: "Cuatitlan",
-            town: "El mirador",
-            street: "Lazaro cardenas",
-            number: "8",
-            "zip": 54095
-        },
-        facebook:"https://github.com/Artuuro96/dp-sip-server",
-        birthday: "03/20/1960",
-        avatar:"https://github.com/Artuuro96/dp-sip-server"
-    }
+      name: 'Arturo',
+      lastName: 'Rodriguez',
+      secondLastName: 'Olvera',
+      email: 'arturo.rodriguez@gmail.com',
+      cellPhone: 5541588339,
+      phone: 5541588339,
+      rfc: 'ARO960',
+      address: {
+        country: 'Mexico',
+        state: 'Estado de Mexico',
+        city: 'Cuatitlan',
+        town: 'El mirador',
+        street: 'Lazaro cardenas',
+        number: '8',
+        zip: 54095,
+      },
+      facebook: 'https://github.com/Artuuro96/dp-sip-server',
+      birthday: '03/20/1960',
+      avatar: 'https://github.com/Artuuro96/dp-sip-server',
+    };
 
-    mockCustomers = [{
-        name:"Arturo",
-        lastName:"Rodriguez",
-        secondLastName:"Olvera",
-        email:"arturo.rodriguez@gmail.com",
-        "cellPhone": 5541588339,
-        "phone": 5541588339,
-        rfc:"ARO960",
-        "address": {
-            country: "Mexico",
-            state: "Estado de Mexico",
-            city: "Cuatitlan",
-            town: "El mirador",
-            street: "Lazaro cardenas",
-            number: "8",
-            "zip": 54095
-        },
-        facebook:"https://github.com/Artuuro96/dp-sip-server",
-        birthday: new Date("03/20/1960"),
-        avatar:"https://github.com/Artuuro96/dp-sip-server",
-        createdBy: 'id-1'
-      },{
-        name:"Josue",
-        lastName:"Ramirez",
-        secondLastName:"Salvador",
-        email:"josue.ramirez@gmail.com",
+    mockCustomers = [
+      {
+        name: 'Arturo',
+        lastName: 'Rodriguez',
+        secondLastName: 'Olvera',
+        email: 'arturo.rodriguez@gmail.com',
         cellPhone: 5541588339,
         phone: 5541588339,
-        rfc:"RASJ96",
+        rfc: 'ARO960',
         address: {
-            country: "Mexico",
-            state: "Estado de Mexico",
-            city: "Tlalnepantla",
-            town: "Los reyes",
-            street: "Av paseo del ferrocarril",
-            number: "93",
-            "zip": 54090
+          country: 'Mexico',
+          state: 'Estado de Mexico',
+          city: 'Cuatitlan',
+          town: 'El mirador',
+          street: 'Lazaro cardenas',
+          number: '8',
+          zip: 54095,
         },
-        facebook:"https://github.com/Artuuro96/dp-sip-server",
-        birthday: new Date("03/20/1960"),
-        avatar:"https://github.com/Artuuro96/dp-sip-server",
-        createdBy: 'id-1'
-      }
+        facebook: 'https://github.com/Artuuro96/dp-sip-server',
+        birthday: new Date('03/20/1960'),
+        avatar: 'https://github.com/Artuuro96/dp-sip-server',
+        createdBy: 'id-1',
+      },
+      {
+        name: 'Josue',
+        lastName: 'Ramirez',
+        secondLastName: 'Salvador',
+        email: 'josue.ramirez@gmail.com',
+        cellPhone: 5541588339,
+        phone: 5541588339,
+        rfc: 'RASJ96',
+        address: {
+          country: 'Mexico',
+          state: 'Estado de Mexico',
+          city: 'Tlalnepantla',
+          town: 'Los reyes',
+          street: 'Av paseo del ferrocarril',
+          number: '93',
+          zip: 54090,
+        },
+        facebook: 'https://github.com/Artuuro96/dp-sip-server',
+        birthday: new Date('03/20/1960'),
+        avatar: 'https://github.com/Artuuro96/dp-sip-server',
+        createdBy: 'id-1',
+      },
     ];
 
     mockUpdatedCustomer = {
-        name:"Raul",
-        lastName:"Ramirez",
-        secondLastName:"Salvador",
-        email:"josue.ramirez@gmail.com",
-        cellPhone: 5541588339,
-        phone: 5541588339,
-        rfc:"RASJ96",
-        address: {
-            country: "Mexico",
-            state: "Estado de Mexico",
-            city: "Tlalnepantla",
-            town: "Los reyes",
-            street: "Av paseo del ferrocarril",
-            number: "93",
-            "zip": 54090
-        },
-        facebook:"https://github.com/Artuuro96/dp-sip-server",
-        birthday: new Date("03/20/1960"),
-        avatar:"https://github.com/Artuuro96/dp-sip-server",
-        createdBy: 'id-1'
-    }
+      name: 'Raul',
+      lastName: 'Ramirez',
+      secondLastName: 'Salvador',
+      email: 'josue.ramirez@gmail.com',
+      cellPhone: 5541588339,
+      phone: 5541588339,
+      rfc: 'RASJ96',
+      address: {
+        country: 'Mexico',
+        state: 'Estado de Mexico',
+        city: 'Tlalnepantla',
+        town: 'Los reyes',
+        street: 'Av paseo del ferrocarril',
+        number: '93',
+        zip: 54090,
+      },
+      facebook: 'https://github.com/Artuuro96/dp-sip-server',
+      birthday: new Date('03/20/1960'),
+      avatar: 'https://github.com/Artuuro96/dp-sip-server',
+      createdBy: 'id-1',
+    };
 
     mockDeletedCustomer = {
       deleted: true,
-      name:"Raul",
-      lastName:"Ramirez",
-      secondLastName:"Salvador",
-      email:"josue.ramirez@gmail.com",
+      name: 'Raul',
+      lastName: 'Ramirez',
+      secondLastName: 'Salvador',
+      email: 'josue.ramirez@gmail.com',
       cellPhone: 5541588339,
       phone: 5541588339,
-      rfc:"RASJ96",
+      rfc: 'RASJ96',
       address: {
-          country: "Mexico",
-          state: "Estado de Mexico",
-          city: "Tlalnepantla",
-          town: "Los reyes",
-          street: "Av paseo del ferrocarril",
-          number: "93",
-          "zip": 54090
+        country: 'Mexico',
+        state: 'Estado de Mexico',
+        city: 'Tlalnepantla',
+        town: 'Los reyes',
+        street: 'Av paseo del ferrocarril',
+        number: '93',
+        zip: 54090,
       },
-      facebook:"https://github.com/Artuuro96/dp-sip-server",
-      birthday: new Date("03/20/1960"),
-      avatar:"https://github.com/Artuuro96/dp-sip-server",
-      createdBy: 'id-1'
-    }
+      facebook: 'https://github.com/Artuuro96/dp-sip-server',
+      birthday: new Date('03/20/1960'),
+      avatar: 'https://github.com/Artuuro96/dp-sip-server',
+      createdBy: 'id-1',
+    };
 
     mockCustomerDeleted = {
-      deleted: true
-    }
-
+      deleted: true,
+    };
 
     customerService = module.get<CustomerService>(CustomerService);
     customerRepository = module.get<CustomerRepository>(CustomerRepository);
@@ -154,14 +154,13 @@ describe('CustomerService', () => {
       customerRepository.create = jest.fn().mockResolvedValue(mockCustomers[0]);
       customerRepository.find = jest.fn().mockResolvedValue([]);
       const result = await customerService.create(mockCustomerDTO);
-      expect(result).toBe((mockCustomers[0]));
+      expect(result).toBe(mockCustomers[0]);
     });
 
     it('should fail creating a New customer', async () => {
       customerRepository.find = jest.fn().mockResolvedValue(mockCustomers);
       await expect(customerService.create(mockCustomerDTO)).rejects.toThrow('Email already registered');
     });
-
   });
 
   describe('findbyId Customer', () => {
@@ -193,20 +192,20 @@ describe('CustomerService', () => {
     it('should update a Customer', async () => {
       customerRepository.updateOne = jest.fn().mockResolvedValue(mockUpdatedCustomer);
       customerRepository.findById = jest.fn().mockResolvedValue(mockCustomers[0]);
-      const result = await customerService.update({ name:'Raul'}, 'id-1');
+      const result = await customerService.update({ name: 'Raul' }, 'id-1');
       expect(result).toBe(mockUpdatedCustomer);
     });
 
     it('should fail update a Customer', async () => {
       customerRepository.updateOne = jest.fn().mockResolvedValue(mockUpdatedCustomer);
       customerRepository.findById = jest.fn().mockResolvedValue(null);
-      await expect(customerService.update({ name:'Raul'}, 'id-1')).rejects.toThrow('User not found');
+      await expect(customerService.update({ name: 'Raul' }, 'id-1')).rejects.toThrow('User not found');
     });
 
     it('should fail update a Customer that was deleted', async () => {
       customerRepository.updateOne = jest.fn().mockResolvedValue(mockUpdatedCustomer);
       customerRepository.findById = jest.fn().mockResolvedValue(mockCustomerDeleted);
-      await expect(customerService.update({ name:'Raul'}, 'id-1')).rejects.toThrow('User not found');
+      await expect(customerService.update({ name: 'Raul' }, 'id-1')).rejects.toThrow('User not found');
     });
   });
 
@@ -230,5 +229,4 @@ describe('CustomerService', () => {
       await expect(customerService.delete('id-1')).rejects.toThrow('User already deleted');
     });
   });
-
 });

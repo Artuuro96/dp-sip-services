@@ -90,12 +90,24 @@ export class BatchService {
     const batchFound = await this.batchRepository.findById(batchId, {
       _id: 1,
       deleted: 1,
+      landIds: 1,
     });
+
+    if (batch.landIds && batch.landIds.length > 0) {
+      for (const landId of batch.landIds) {
+        const landsIdFound = batchFound.landIds.map((id) => id.toString());
+        if (!landsIdFound.includes(landId)) {
+          const landFound = await this.landRepository.findById(landId);
+          if (isNil(landFound)) throw new NotFoundException('Batch not found');
+          if (landFound.deleted) throw new NotFoundException('Batch not found');
+        }
+      }
+    }
 
     if (isNil(batchFound)) throw new NotFoundException('Batch not found');
     if (batchFound.deleted) throw new NotFoundException('Batch not found');
 
-    batch.Id = batchId;
+    batch._id = batchId;
     const batchUpdated = await this.batchRepository.updateOne(batch);
     if (!isNil(batchUpdated.landIds)) {
       await this.updateLand(executionCtx, batchFound._id, batchUpdated.landIds);
@@ -142,12 +154,12 @@ export class BatchService {
   async updateLand(excutionCtx: Context, batchId, landIds: string[]): Promise<void> {
     const findOptiopns = {
       query: {
-        Id: { $in: landIds },
+        _id: { $in: landIds },
       },
       projection: {
-        Id: 1,
+        _id: 1,
         batchId: 1,
-        delete: 1,
+        deleted: 1,
       },
     };
     const landsFound = await this.landRepository.find(findOptiopns);

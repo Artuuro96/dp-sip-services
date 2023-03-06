@@ -21,7 +21,7 @@ export class Batch extends Base {
   geofence: string[];
 
   @Prop()
-  total_size?: number;
+  totalSize?: number;
 
   /*constructor(Batch:Partial<Batch>) {
     super(Batch)
