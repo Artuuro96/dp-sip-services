@@ -26,10 +26,12 @@ WORKDIR /app
 ARG mongodb_uri
 ARG acma_base_url
 ARG port
+ARG mongodb_name
 
 ##Database envs
 ENV NODE_ENV=production
 ENV MONGODB_URI=$mongodb_uri
+ENV MONGODB_NAME=$mongodb_name
 
 #Security Envs
 ENV PORT=$port

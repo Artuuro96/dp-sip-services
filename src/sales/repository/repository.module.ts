@@ -32,7 +32,10 @@ const schemas = [
 const config = new ConfigService();
 
 @Module({
-  imports: [MongooseModule.forRoot(config.get('MONGODB_URI')), MongooseModule.forFeature(schemas)],
+  imports: [
+    MongooseModule.forRoot(config.get('MONGODB_URI'), { dbName: config.get('MONGODB_NAME') }),
+    MongooseModule.forFeature(schemas),
+  ],
   exports: [CreditRepository, BatchRepository, LandRepository, ContractRepository],
   providers: [CreditRepository, BatchRepository, LandRepository, ContractRepository],
 })
