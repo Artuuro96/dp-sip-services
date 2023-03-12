@@ -23,9 +23,9 @@ FROM node:16-alpine as production
 
 WORKDIR /app
 
-#ARG mongodb_uri
-#ARG acma_base_url
-
+ARG mongodb_uri
+ARG acma_base_url
+ARG port
 
 ##Database envs
 ENV NODE_ENV=production
