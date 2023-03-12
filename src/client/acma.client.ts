@@ -20,7 +20,7 @@ export class AcmaClient {
       },
     };
     try {
-      const response = await this.acmaAxios.post<AuthResponse>('/auth/refresh', { token }, axiosConfig);
+      const response = await this.acmaAxios.post<AuthResponse>('/auth/verify', { token }, axiosConfig);
       return response.data;
     } catch (error) {
       if (error?.response?.status === HttpStatus.UNAUTHORIZED) {
