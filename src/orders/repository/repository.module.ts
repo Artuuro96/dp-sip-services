@@ -11,6 +11,7 @@ import { Customer, CustomerSchema } from './schemas/customer.schema';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 import { Land, LandSchema } from '../../sales/repository/schemas/land.schema';
 import { Batch, BatchSchema } from '../../sales/repository/schemas/batch.schema';
+import { ConfigService } from 'src/config/config.service';
 
 const schemas = [
   {
@@ -35,8 +36,10 @@ const schemas = [
   },
 ];
 
+const config = new ConfigService();
+
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://localhost:27017'), MongooseModule.forFeature(schemas)],
+  imports: [MongooseModule.forRoot(config.get('MONGODB_URI')), MongooseModule.forFeature(schemas)],
   exports: [BatchRepository, ContractRepository, CustomerRepository, PaymentRepository, LandRepository],
   providers: [BatchRepository, ContractRepository, CustomerRepository, PaymentRepository, LandRepository],
 })

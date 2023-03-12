@@ -42,10 +42,11 @@ export class ContractService {
       if (batch.deleted) throw new NotFoundException('Batch not found');
     }
 
-    let status = ContractStatusEnum.SELLED;
+    let status = ContractStatusEnum.AFFECTED;
     if (contract.paymentType === PaymentTypeEnum.FULLPAYMENT) {
       status = ContractStatusEnum.AVAILABLE;
     }
+
     const newContract = {
       ...contract,
       contractNumber: uuidv4(),
@@ -53,7 +54,6 @@ export class ContractService {
       status: status,
       createdBy: executionCtx.userId,
     };
-    console.log(newContract);
     const contractCreated = await this.contractRepository.create(newContract);
 
     if (isNil(contractCreated)) throw new BadRequestException('Error creating contract');
