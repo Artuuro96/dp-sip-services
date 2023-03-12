@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { BadRequestException, ValidationError, ValidationPipe } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
@@ -10,6 +11,13 @@ async function bootstrap() {
   const config = new ConfigService();
   app.useGlobalFilters(new GlobalExceptionFilter(), new HttpExceptionFilter());
   app.setGlobalPrefix('/api/v1');
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        return new BadRequestException(validationErrors);
+      },
+    }),
+  );
   app.useLogger(app.get(Logger));
   await app.listen(config.get('PORT') || 80);
 }

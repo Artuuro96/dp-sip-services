@@ -75,8 +75,8 @@ export class CustomerService {
     return {
       result: customers,
       total: countCustomers,
-      page: skip,
-      pages: Math.ceil(countCustomers / limit),
+      page: skip !== 0 ? 1 : skip,
+      pages: Math.ceil(countCustomers / limit) || 0,
     };
   }
 

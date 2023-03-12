@@ -22,7 +22,7 @@ export class LandService {
     const { address } = land;
 
     if (!isNil(land.batchId)) {
-      const projection = { Id: 1, delete: 1 };
+      const projection = { _id: 1, delete: 1 };
       const batch: Batch = await this.batchRepository.findById(land.batchId, projection);
       if (isNil(batch)) throw new NotFoundException('Batch not found');
       if (batch.deleted) throw new NotFoundException('Batch not found');
@@ -79,8 +79,8 @@ export class LandService {
     return {
       result: lands,
       total: countLands,
-      page: skip,
-      pages: Math.ceil(countLands / limit),
+      page: skip !== 0 ? 1 : skip,
+      pages: Math.ceil(countLands / limit) || 0,
     };
   }
 
@@ -97,7 +97,7 @@ export class LandService {
     });
 
     if (!isNil(land.batchId)) {
-      const projection = { Id: 1, delete: 1 };
+      const projection = { _id: 1, delete: 1 };
       const batch: Batch = await this.batchRepository.findById(land.batchId, projection);
       if (isNil(batch)) throw new NotFoundException('Batch not found');
       if (batch.deleted) throw new NotFoundException('Batch not found');
@@ -105,8 +105,9 @@ export class LandService {
 
     if (isNil(landFound)) throw new NotFoundException('Land not found');
     if (landFound.deleted) throw new NotFoundException('Land not found');
-    land.Id = landId;
+    land._id = landId;
     land.updatedBy = exectionCtx.userId;
+
     return this.landRepository.updateOne(land);
   }
 
@@ -139,7 +140,7 @@ export class LandService {
    * @returns Returns the Batch updated
    */
   async deleteLandInBatch(batchId: string, landId: string): Promise<Batch> {
-    const projection = { Id: 1, delete: 1, landIds: 1 };
+    const projection = { _id: 1, delete: 1, landIds: 1 };
     const batch: Batch = await this.batchRepository.findById(batchId, projection);
 
     if (isNil(batch)) throw new NotFoundException('Batch not found');
@@ -150,7 +151,7 @@ export class LandService {
     const newLandsArray = batch.landIds.filter((item) => item !== landId);
 
     return this.batchRepository.updateOne({
-      Id: batchId,
+      _id: batchId,
       landIds: newLandsArray,
     });
   }

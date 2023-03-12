@@ -1,8 +1,8 @@
-import { Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
-import { Base } from './base'
+import { Base } from './base';
 
 export type CustomerDocument = HydratedDocument<Customer>;
 
@@ -32,17 +32,17 @@ export class Address {
 @Schema()
 export class Customer extends Base {
   _id?: Types.ObjectId;
-  
-  @Prop({required: true})
+
+  @Prop({ required: true })
   name: string;
 
-  @Prop({required: true})
+  @Prop({ required: true })
   lastName: string;
 
   @Prop()
   secondLastName: string;
 
-  @Prop({required: true})
+  @Prop({ required: true })
   email: string;
 
   @Prop()
@@ -51,7 +51,7 @@ export class Customer extends Base {
   @Prop()
   phone?: number;
 
-  @Prop({required: true})
+  @Prop({ required: true })
   rfc: string;
 
   @Prop()
@@ -62,7 +62,7 @@ export class Customer extends Base {
   @Prop()
   address: Address;
 
-  @Prop({required: true})
+  @Prop({ required: true })
   birthday: Date;
 
   @Prop()

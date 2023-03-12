@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { CreditStatusEnum } from '../enums/credit.enum';
+import { ContractStatusEnum } from 'src/orders/repository/enums/contract.enum';
+//import { CreditStatusEnum } from '../enums/credit.enum';
 import { TermTypeEnum } from '../enums/term.enum copy';
 import { Base } from './base';
 
@@ -17,10 +18,13 @@ export class Credit extends Base {
   customerId: string;
 
   @Prop({ type: SchemaTypes.ObjectId })
-  landId: string;
+  landId?: string;
+
+  @Prop({ type: SchemaTypes.ObjectId })
+  batchId?: string;
 
   @Prop()
-  creditNumber: string[];
+  creditNumber: string;
 
   @Prop()
   startDate: Date;
@@ -29,22 +33,25 @@ export class Credit extends Base {
   endDate: Date;
 
   @Prop()
-  status: CreditStatusEnum;
+  status: ContractStatusEnum;
 
   @Prop()
   termType: TermTypeEnum;
 
-  @Prop()
+  @Prop() //Plazo a pagar va relacionado a term
   termQuantity: number;
 
-  @Prop()
+  @Prop() //Dia de pago
+  paymentDay: number;
+
+  @Prop() //Cuanto debes pagar
   regularPayment: number;
 
   @Prop()
   totalDebt: number;
 
-  @Prop([{ type: SchemaTypes.ObjectId }])
-  paymentIds: string[];
+  @Prop([{ type: SchemaTypes.ObjectId, default: [] }])
+  paymentIds?: string[];
 
   @Prop()
   interestRate: number;

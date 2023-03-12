@@ -9,26 +9,22 @@ export class ContractRepository {
   ) {}
 
   async create(contract: Contract): Promise<Contract> {
-    return this.contractModel.create(contract)
+    return this.contractModel.create(contract);
   }
 
   async find(findOptiopns): Promise<Contract[]> {
-    const {query, projection, options} = findOptiopns;
-    const contractFind = this.contractModel.find(query)
-    if(!isNil(projection))
-      contractFind.projection(projection)
-    if(isNil(options))
-      return  contractFind
-    
-    const {limit, skip} = options
-    if(!isNil(limit))
-      contractFind.limit(limit)
-    if(!isNil(skip))
-      contractFind.skip(skip)
+    const { query, projection, options } = findOptiopns;
+    const contractFind = this.contractModel.find(query);
+    if (!isNil(projection)) contractFind.projection(projection);
+    if (isNil(options)) return contractFind;
 
-    return  contractFind
+    const { limit, skip } = options;
+    if (!isNil(limit)) contractFind.limit(limit);
+    if (!isNil(skip)) contractFind.skip(skip);
+
+    return contractFind;
   }
-f
+  f;
   async count(query): Promise<number> {
     return this.contractModel.count(query);
   }
@@ -41,7 +37,7 @@ f
     return this.contractModel.findOneAndUpdate(
       { _id: contract._id },
       contract,
-      {new: true}
+      { new: true },
     );
   }
 }

@@ -1,4 +1,4 @@
 export enum PaymentTypeEnum {
-    CASH,
-    CREDIT
-  }
+  FULLPAYMENT = 'fullPayment',
+  CREDIT = 'credit',
+}

@@ -1,14 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsEmail, IsString, IsUrl, IsObject, IsOptional, IsNotEmpty, ValidateNested, IsNumber } from 'class-validator';
+import { IsEmail, IsString, IsUrl, IsObject, IsOptional, ValidateNested, IsNumber } from 'class-validator';
 import { AddressDTO } from './address.dto';
 
 export class CustomerDTO {
   @IsString()
-  @IsNotEmpty()
   name: string;
 
   @IsString()
-  @IsNotEmpty()
   lastName: string;
 
   @IsString()
@@ -16,18 +14,15 @@ export class CustomerDTO {
 
   @IsString()
   @IsEmail()
-  @IsNotEmpty()
   email: string;
 
   @IsNumber()
-  @IsNotEmpty()
   cellPhone: number;
 
   @IsNumber()
   phone: number;
 
   @IsString()
-  @IsNotEmpty()
   rfc: string;
 
   @IsString()
