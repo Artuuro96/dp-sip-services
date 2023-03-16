@@ -17,6 +17,7 @@ export class CreditService {
 
     if (isNil(contract)) throw new NotFoundException('Contract not found');
     if (contract.deleted) throw new NotFoundException('Contract not found');
+    if (contract.creditId) throw new NotFoundException('Contract has already a credit');
 
     if (credit.termType === TermTypeEnum.MONThLY) {
       if (credit.paymentDay < 1 || credit.paymentDay > 31)

@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new ConfigService();
   app.useGlobalFilters(new GlobalExceptionFilter(), new HttpExceptionFilter());
-  app.setGlobalPrefix('/api/v1');
+  app.setGlobalPrefix('/v1');
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (validationErrors: ValidationError[] = []) => {

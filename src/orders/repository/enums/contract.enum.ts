@@ -1,11 +1,6 @@
 export enum ContractStatusEnum {
-  AVAILABLE = 'DISPONIBLE',
-  SELLED = 'VENDIDO',
-  PAIDOFF = 'LIQUIDADO',
-  APART = 'APARTADO',
-  RELOCATE = 'REUBICAR',
-  SRMIGUEL = 'SRMIGUEL',
-  TAKEN = 'INVADIDO',
-  AFFECTED = 'AFECTADO',
-  DISMISSED = 'BAJA',
+  CREATED = 'creado',
+  IN_PROGRESS = 'enProgreso',
+  FINISHED = 'terminado',
+  CANCELLED = 'cancelado',
 }

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
+import { LandStatusEnum } from '../enums/land.enum';
 import { Base } from './base';
 
 export type LandDocument = HydratedDocument<Land>;
@@ -34,6 +35,9 @@ export class Land extends Base {
   _id?: Types.ObjectId;
 
   @Prop()
+  status: LandStatusEnum;
+
+  @Prop()
   name: string;
 
   @Prop()
@@ -50,6 +54,12 @@ export class Land extends Base {
 
   @Prop()
   size: string;
+
+  @Prop()
+  square?: string;
+
+  @Prop()
+  comments?: string;
 
   @ValidateNested()
   @Type(() => Address)

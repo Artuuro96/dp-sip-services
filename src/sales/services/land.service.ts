@@ -7,6 +7,8 @@ import { LandDTO } from '../dtos/land.dto';
 import { isNil } from 'lodash';
 import { Batch } from '../repository/schemas/batch.schema';
 import { Context } from 'src/auth/context/execution-ctx';
+import * as XLSX from 'xlsx';
+import { LandStatusEnum } from '../repository/enums/land.enum';
 
 @Injectable()
 export class LandService {
@@ -154,5 +156,73 @@ export class LandService {
       _id: batchId,
       landIds: newLandsArray,
     });
+  }
+
+  async importFile(executionCtx: Context, fileImport) {
+    const workbook = XLSX.read(fileImport.buffer);
+    const main = workbook.SheetNames[0];
+    const sheetOne = workbook.Sheets[main];
+    const dataSheetOne = XLSX.utils.sheet_to_json(sheetOne);
+    const successfulLandsObj: object[] = [];
+    const errorLandsObj: object[] = [];
+
+    for (const [index, landDataToCreate] of dataSheetOne.entries()) {
+      const defaultName = `${landDataToCreate['__EMPTY_1']} - ${index}`;
+      const defaultSuccessObjectLand = { name: defaultName, id: '' };
+      const defaultErrorObjectLand = { name: defaultName, error: '' };
+      const addressCreate: Address = {
+        country: 'Mexico',
+        state: landDataToCreate['__EMPTY_15'] ? landDataToCreate['__EMPTY_15'] : 'EMPTY',
+        city: landDataToCreate['__EMPTY_16'] ? landDataToCreate['__EMPTY_16'] : 'EMPTY',
+        town: landDataToCreate['__EMPTY_17'],
+        street: landDataToCreate['__EMPTY_18'],
+        number: landDataToCreate['__EMPTY_19'],
+        zip: landDataToCreate['__EMPTY_20'] ? landDataToCreate['__EMPTY_20'] : 'EMPTY',
+      };
+      const landCreate: Land = {
+        status: landDataToCreate['__EMPTY'] ? landDataToCreate['__EMPTY'] : 'EMPTY',
+        name: landDataToCreate['__EMPTY_1'] ? landDataToCreate['__EMPTY_1'] : 'EMPTY',
+        price: landDataToCreate['__EMPTY_7'],
+        size: landDataToCreate['__EMPTY_8'],
+        square: landDataToCreate['__EMPTY_2'],
+        comments: landDataToCreate['__EMPTY_14'],
+        geofence: [],
+        available: landDataToCreate['__EMPTY'] == LandStatusEnum.AVAILABLE,
+        address: addressCreate,
+        createdBy: executionCtx.userId,
+      };
+
+      const validateValuesAddress = Object.values(addressCreate).includes('EMPTY');
+      const validateValuesLand = Object.values(landCreate).includes('EMPTY');
+      if (validateValuesAddress || validateValuesLand) {
+        defaultErrorObjectLand.error = 'Missing fields or wrong order';
+        errorLandsObj.push(defaultErrorObjectLand);
+      }
+
+      const landFound = await this.landRepository.findOne({
+        name: landCreate.name,
+        status: landCreate.status,
+      });
+
+      if (!isNil(landFound)) {
+        defaultErrorObjectLand.error = 'Already exists';
+        errorLandsObj.push(defaultErrorObjectLand);
+      }
+
+      const landCreated = await this.landRepository.create(landCreate);
+
+      if (!isNil(landCreated) && !isNil(landCreated._id)) {
+        defaultSuccessObjectLand.id = landCreated._id.toString();
+        successfulLandsObj.push(defaultSuccessObjectLand);
+      } else {
+        defaultErrorObjectLand.error = 'Error Creating It';
+        errorLandsObj.push(defaultErrorObjectLand);
+      }
+    }
+
+    return {
+      successfulLandsObj,
+      errorLandsObj,
+    };
   }
 }
