@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { ContractStatusEnum } from 'src/orders/repository/enums/contract.enum';
-//import { CreditStatusEnum } from '../enums/credit.enum';
+import { CreditStatusEnum } from '../enums/credit.enum';
 import { TermTypeEnum } from '../enums/term.enum copy';
 import { Base } from './base';
 
@@ -33,7 +32,7 @@ export class Credit extends Base {
   endDate: Date;
 
   @Prop()
-  status: ContractStatusEnum;
+  status: CreditStatusEnum;
 
   @Prop()
   termType: TermTypeEnum;

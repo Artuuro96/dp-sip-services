@@ -10,7 +10,10 @@ import { Contract, ContractSchema } from './schemas/contract.schema';
 import { Customer, CustomerSchema } from './schemas/customer.schema';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 import { Land, LandSchema } from '../../sales/repository/schemas/land.schema';
-import { Batch, BatchSchema } from '../../sales/repository/schemas/batch.schema';
+import {
+  Batch,
+  BatchSchema,
+} from '../../sales/repository/schemas/batch.schema';
 import { ConfigService } from 'src/config/config.service';
 
 const schemas = [
@@ -40,10 +43,24 @@ const config = new ConfigService();
 
 @Module({
   imports: [
-    MongooseModule.forRoot(config.get('MONGODB_URI'), { dbName: config.get('MONGODB_NAME') }),
+    MongooseModule.forRoot(config.get('MONGODB_URI'), {
+      dbName: config.get('MONGODB_NAME'),
+    }),
     MongooseModule.forFeature(schemas),
   ],
-  exports: [BatchRepository, ContractRepository, CustomerRepository, PaymentRepository, LandRepository],
-  providers: [BatchRepository, ContractRepository, CustomerRepository, PaymentRepository, LandRepository],
+  exports: [
+    BatchRepository,
+    ContractRepository,
+    CustomerRepository,
+    PaymentRepository,
+    LandRepository,
+  ],
+  providers: [
+    BatchRepository,
+    ContractRepository,
+    CustomerRepository,
+    PaymentRepository,
+    LandRepository,
+  ],
 })
 export class RepositoryModule {}
