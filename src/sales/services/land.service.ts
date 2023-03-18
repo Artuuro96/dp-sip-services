@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { BatchRepository } from '../repository/repositories/batch.repository';
 import { LandRepository } from '../repository/repositories/land.repository';
 import { Address, Land } from '../repository/schemas/land.schema';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { LandDTO } from '../dtos/land.dto';
 import { isNil } from 'lodash';
 import { Batch } from '../repository/schemas/batch.schema';
@@ -61,7 +61,7 @@ export class LandService {
    * @description Find all the land paginated
    * @returns {PaginateResult} Object with the land paginate
    */
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Land>> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {

@@ -13,10 +13,10 @@ export class AcmaClient {
     });
   }
 
-  async authRequest(token: string, refreshToken: string): Promise<AuthResponse> {
+  async authRequest(token: string): Promise<AuthResponse> {
     const axiosConfig: AxiosRequestConfig = {
       headers: {
-        Authorization: `Bearer ${refreshToken}`,
+        Authorization: `Bearer ${token}`,
       },
     };
     try {

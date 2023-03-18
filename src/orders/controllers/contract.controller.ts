@@ -5,7 +5,7 @@ import { ContractService } from '../services/contract.service';
 import { Contract } from '../repository/schemas/contract.schema';
 import { ExecutionCtx } from 'src/auth/decorators/execution-ctx.decorator';
 import { Context } from 'src/auth/context/execution-ctx';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
 
 @UseGuards(AuthGuard)
@@ -26,7 +26,7 @@ export class ContractController {
   }
 
   @Get()
-  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Contract>> {
     return this.contractService.findAll(keyValue, skip, limit);
   }
 }

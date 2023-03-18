@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { Land } from '../repository/schemas/land.schema';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { LandDTO } from '../dtos/land.dto';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
 import { LandService } from '../services/land.service';
@@ -28,7 +28,7 @@ export class LandController {
   }
 
   @Get()
-  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Land>> {
     return this.landService.findAll(keyValue, skip, limit);
   }
 

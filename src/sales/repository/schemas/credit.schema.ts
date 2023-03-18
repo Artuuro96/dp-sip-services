@@ -50,16 +50,22 @@ export class Credit extends Base {
   @Prop()
   totalDebt: number;
 
+  @Prop()
+  currentBalance: number;
+
   @Prop([{ type: SchemaTypes.ObjectId, default: [] }])
   paymentIds?: string[];
 
   @Prop()
   interestRate: number;
 
-  /*constructor(Credit:Partial<Credit>) {
-    super(Credit)
-    Object.assign(this, Credit)
-  }*/
+  @Prop()
+  totalPayments?: number;
+
+  constructor(Credit: Partial<Credit> = {}) {
+    super();
+    Object.assign(this, Credit);
+  }
 }
 
 export const CreditSchema = SchemaFactory.createForClass(Credit);

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
+import { BehaviourEnum } from '../enums/behaviour.enum';
 import { Base } from './base';
 
 export type CustomerDocument = HydratedDocument<Customer>;
@@ -71,10 +72,16 @@ export class Customer extends Base {
   @Prop()
   avatar: string;
 
-  /*constructor(customer:Partial<Customer>) {
-    super(customer)
-    Object.assign(this, customer)
-  }*/
+  @Prop({ default: 10 })
+  creditPoints?: number;
+
+  @Prop({ default: BehaviourEnum.OK })
+  behaviour?: BehaviourEnum;
+
+  constructor(customer: Partial<Customer> = {}) {
+    super();
+    Object.assign(this, customer);
+  }
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

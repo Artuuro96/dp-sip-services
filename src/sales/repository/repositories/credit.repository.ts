@@ -4,9 +4,7 @@ import { isNil } from 'lodash';
 import { Credit, CreditDocument } from '../schemas/credit.schema';
 
 export class CreditRepository {
-  constructor(
-    @InjectModel(Credit.name) private creditModel: Model<CreditDocument>,
-  ) {}
+  constructor(@InjectModel(Credit.name) private creditModel: Model<CreditDocument>) {}
 
   async create(credit: Credit): Promise<Credit> {
     return this.creditModel.create(credit);
@@ -29,11 +27,11 @@ export class CreditRepository {
     return this.creditModel.count(query);
   }
 
-  async findById(creditId, projection?): Promise<Credit> {
+  async findById(creditId: string, projection?): Promise<Credit> {
     return this.creditModel.findById(creditId, projection);
   }
 
-  async updateOne(credit): Promise<Credit> {
+  async updateOne(credit: Credit): Promise<Credit> {
     return this.creditModel.findOneAndUpdate({ _id: credit._id }, credit, {
       new: true,
     });

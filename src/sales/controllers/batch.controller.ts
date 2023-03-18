@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { Batch } from '../repository/schemas/batch.schema';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { BatchDTO } from '../dtos/batch.dto';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
 import { BatchService } from '../services/batch.service';
@@ -28,7 +28,7 @@ export class BatchController {
   }
 
   @Get()
-  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Batch>> {
     return this.batchService.findAll(keyValue, skip, limit);
   }
 

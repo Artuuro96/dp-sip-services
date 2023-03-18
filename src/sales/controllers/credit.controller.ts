@@ -6,12 +6,10 @@ import { Context } from 'src/auth/context/execution-ctx';
 import { ExecutionCtx } from 'src/auth/decorators/execution-ctx.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 
 @UseGuards(AuthGuard)
-@Controller({
-  path: 'credits',
-})
+@Controller('credit')
 export class CreditController {
   constructor(private creditService: CreditService) {}
 
@@ -26,7 +24,7 @@ export class CreditController {
   }
 
   @Get()
-  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Credit>> {
     return this.creditService.findAll(keyValue, skip, limit);
   }
 }

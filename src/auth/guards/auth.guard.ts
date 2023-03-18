@@ -19,17 +19,12 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = request.get('authorization').replace('Bearer', '').trim();
-    const refreshToken = request.get('refreshtoken');
 
     if (isEmpty(token)) {
       throw new ForbiddenException('No token found');
     }
 
-    if (isEmpty(refreshToken)) {
-      throw new ForbiddenException('No refreshToken found');
-    }
-
-    await this.acmaClient.authRequest(token, refreshToken);
+    await this.acmaClient.authRequest(token);
 
     const user = await this.jwtService.decode(token);
     request.user = user;

@@ -3,7 +3,7 @@ import { CustomerDTO } from '../dtos/customer.dto';
 import { CustomerRepository } from '../repository/repositories/customer.repository';
 import { Address, Customer } from '../repository/schemas/customer.schema';
 import { isNil } from 'lodash';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { Context } from 'src/auth/context/execution-ctx';
 
 @Injectable()
@@ -59,7 +59,7 @@ export class CustomerService {
    * @description Find all the customer paginated
    * @returns {PaginateResult} Object with the customer paginate
    */
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Customer>> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {

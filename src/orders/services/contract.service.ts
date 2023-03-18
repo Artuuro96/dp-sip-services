@@ -11,7 +11,7 @@ import { ContractStatusEnum } from '../repository/enums/contract.enum';
 import { LandService } from '../../sales/services/land.service';
 import { Context } from 'src/auth/context/execution-ctx';
 import { v4 as uuidv4 } from 'uuid';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 
 @Injectable()
 export class ContractService {
@@ -76,7 +76,7 @@ export class ContractService {
     return contractFound;
   }
 
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Contract>> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {

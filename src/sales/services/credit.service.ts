@@ -6,7 +6,7 @@ import { isNil } from 'lodash';
 import { Credit } from '../repository/schemas/credit.schema';
 import { TermTypeEnum } from '../repository/enums/term.enum copy';
 import { Context } from 'src/auth/context/execution-ctx';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 
 @Injectable()
 export class CreditService {
@@ -18,7 +18,7 @@ export class CreditService {
     if (isNil(contract)) throw new NotFoundException('Contract not found');
     if (contract.deleted) throw new NotFoundException('Contract not found');
 
-    if (credit.termType === TermTypeEnum.MONThLY) {
+    if (credit.termType === TermTypeEnum.MONTHLY) {
       if (credit.paymentDay < 1 || credit.paymentDay > 31)
         throw new BadRequestException('Payment day should be a valid day in a month');
     } else {
@@ -32,6 +32,8 @@ export class CreditService {
       endDate: new Date(credit.endDate),
       paymentIds: [],
       createdBy: executionCtx.userId,
+      currentBalance: credit.totalDebt,
+      regularPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(4)),
     };
 
     const creditCreated = await this.creditRepository.create(newCredit);
@@ -44,14 +46,14 @@ export class CreditService {
     return creditCreated;
   }
 
-  async findById(contractId): Promise<Credit> {
+  async findById(contractId: string): Promise<Credit> {
     const creditFounded = await this.creditRepository.findById(contractId);
     if (isNil(creditFounded)) throw new NotFoundException('Customer not found');
     if (creditFounded.deleted) throw new NotFoundException('Customer not found');
     return creditFounded;
   }
 
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Credit>> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {

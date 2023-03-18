@@ -7,10 +7,12 @@ import { ContractController } from './controllers/contract.controller';
 import { ContractService } from './services/contract.service';
 import { RepositoryModule } from './repository/repository.module';
 import { LandService } from 'src/sales/services/land.service';
+import { PaymentController } from './controllers/payment.controller';
+import { PaymentService } from './services/payment.service';
 
 @Module({
-  controllers: [CustomerController, ContractController],
+  controllers: [CustomerController, ContractController, PaymentController],
   imports: [RepositoryModule, ClientModule, JwtModule],
-  providers: [CustomerService, ContractService, LandService],
+  providers: [CustomerService, ContractService, LandService, PaymentService],
 })
 export class OrderModule {}

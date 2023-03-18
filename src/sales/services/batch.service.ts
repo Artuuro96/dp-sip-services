@@ -3,7 +3,7 @@ import { BatchRepository } from '../repository/repositories/batch.repository';
 import { LandRepository } from '../repository/repositories/land.repository';
 import { LandService } from './land.service';
 import { Batch } from '../repository/schemas/batch.schema';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { BatchDTO } from '../dtos/batch.dto';
 import { isNil } from 'lodash';
 import { Context } from 'src/auth/context/execution-ctx';

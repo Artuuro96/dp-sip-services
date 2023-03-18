@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Patch, Post, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { PaginateResult } from '../repository/interfaces/paginate-result.interface';
+import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { Customer } from '../repository/schemas/customer.schema';
 import { CustomerDTO } from '../dtos/customer.dto';
 import { PaginationParamsDTO } from '../dtos/paginationParams.dto';
@@ -28,7 +28,7 @@ export class CustomerController {
   }
 
   @Get()
-  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult> {
+  async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Customer>> {
     return this.customerService.findAll(keyValue, skip, limit);
   }
 

@@ -1,4 +1,4 @@
 export enum TermTypeEnum {
-  WEEKLY = 'weekly',
-  MONThLY = 'monthly',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
 }

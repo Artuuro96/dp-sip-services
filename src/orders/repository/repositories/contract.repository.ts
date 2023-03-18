@@ -4,9 +4,7 @@ import { isNil } from 'lodash';
 import { Contract, ContractDocument } from '../schemas/contract.schema';
 
 export class ContractRepository {
-  constructor(
-    @InjectModel(Contract.name) private contractModel: Model<ContractDocument>,
-  ) {}
+  constructor(@InjectModel(Contract.name) private contractModel: Model<ContractDocument>) {}
 
   async create(contract: Contract): Promise<Contract> {
     return this.contractModel.create(contract);
@@ -34,10 +32,6 @@ export class ContractRepository {
   }
 
   async updateOne(contract): Promise<Contract> {
-    return this.contractModel.findOneAndUpdate(
-      { _id: contract._id },
-      contract,
-      { new: true },
-    );
+    return this.contractModel.findOneAndUpdate({ _id: contract._id }, contract, { new: true });
   }
 }
