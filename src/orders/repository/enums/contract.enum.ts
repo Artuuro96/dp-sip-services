@@ -1,6 +1,6 @@
 export enum ContractStatusEnum {
-  CREATED = 'creado',
-  IN_PROGRESS = 'enProgreso',
-  FINISHED = 'terminado',
-  CANCELLED = 'cancelado',
+  CREATED = 'CREATED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  FINISHED = 'FINISHED',
+  CANCELLED = 'CANCELLED',
 }

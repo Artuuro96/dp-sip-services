@@ -1,6 +1,6 @@
 export enum CreditStatusEnum {
-  CREATED = 'creado',
-  ASSIGNED = 'asignado',
-  FINISHED = 'terminado',
-  CANCELLED = 'cancelado',
+  CREATED = 'CREATED',
+  ASSIGNED = 'ASSIGNED',
+  FINISHED = 'FINISHED',
+  CANCELLED = 'CANCELLED',
 }
