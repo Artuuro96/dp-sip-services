@@ -30,6 +30,10 @@ export class BatchRepository {
     return this.batchModel.findById(batchId, projection);
   }
 
+  async findOne(query, projection?): Promise<Batch> {
+    return this.batchModel.findOne(query, projection);
+  }
+
   async updateOne(batch): Promise<Batch> {
     return this.batchModel.findOneAndUpdate({ _id: batch._id }, batch, {
       new: true,
