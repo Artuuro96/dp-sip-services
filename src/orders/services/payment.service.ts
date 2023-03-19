@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Context } from 'src/auth/context/execution-ctx';
 import { PaginateResult } from 'src/interfaces/paginate-result.interface';
 import { CreditStatusEnum } from 'src/sales/repository/enums/credit.enum';
@@ -14,7 +14,6 @@ export class PaymentService {
     private paymentRepository: PaymentRepository,
     private creditRepository: CreditRepository,
     private customerRepository: CustomerRepository,
-    private logger: Logger,
   ) {}
 
   async create(executionCtx: Context, paymentDTO: PaymentDTO): Promise<Payment> {
@@ -44,7 +43,6 @@ export class PaymentService {
     newPayment.quantity = paymentDTO.quantity;
 
     if (!newPayment.isOnTime(credit.paymentDay)) {
-      this.logger.log(`Payment after due date, reducing credit points for ${paymentDTO.customerId}`);
       const creditPoints = await this.customerRepository.findById(paymentDTO.customerId, { creditPoints: 1 });
       await this.customerRepository.updateOne({
         updatedBy: executionCtx.userId,
