@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientModule } from 'src/client/client.module';
 import { CustomerController } from './controllers/customer.controller';
@@ -13,6 +13,6 @@ import { PaymentService } from './services/payment.service';
 @Module({
   controllers: [CustomerController, ContractController, PaymentController],
   imports: [RepositoryModule, ClientModule, JwtModule],
-  providers: [CustomerService, ContractService, LandService, PaymentService],
+  providers: [CustomerService, ContractService, LandService, PaymentService, Logger],
 })
 export class OrderModule {}

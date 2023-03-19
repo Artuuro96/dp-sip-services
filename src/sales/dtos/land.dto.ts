@@ -9,12 +9,17 @@ import {
   IsNumber,
   IsOptional,
 } from 'class-validator';
+import { LandStatusEnum } from '../repository/enums/land.enum';
 import { AddressDTO } from './address.dto';
 
 export class LandDTO {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  status: LandStatusEnum;
 
   @IsArray()
   @IsNotEmpty()
@@ -33,6 +38,14 @@ export class LandDTO {
   @IsString()
   @IsNotEmpty()
   size: string;
+
+  @IsString()
+  @IsOptional()
+  square?: string;
+
+  @IsString()
+  @IsOptional()
+  comments?: string;
 
   @IsObject()
   @ValidateNested({ each: true })

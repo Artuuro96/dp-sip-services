@@ -26,7 +26,7 @@ export class CreditService {
         throw new BadRequestException('Payment day should be a valid day in a week');
     }
 
-    const newCredit: Credit = {
+    const newCredit = new Credit({
       ...credit,
       startDate: new Date(credit.startDate),
       endDate: new Date(credit.endDate),
@@ -34,7 +34,7 @@ export class CreditService {
       createdBy: executionCtx.userId,
       currentBalance: credit.totalDebt,
       regularPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(4)),
-    };
+    });
 
     const creditCreated = await this.creditRepository.create(newCredit);
 

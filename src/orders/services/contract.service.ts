@@ -42,9 +42,9 @@ export class ContractService {
       if (batch.deleted) throw new NotFoundException('Batch not found');
     }
 
-    let status = ContractStatusEnum.AFFECTED;
+    let status = ContractStatusEnum.CREATED;
     if (contract.paymentType === PaymentTypeEnum.FULLPAYMENT) {
-      status = ContractStatusEnum.AVAILABLE;
+      status = ContractStatusEnum.IN_PROGRESS;
     }
 
     const newContract = {

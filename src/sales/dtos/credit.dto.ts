@@ -1,6 +1,5 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { ContractStatusEnum } from 'src/orders/repository/enums/contract.enum';
-//import { CreditStatusEnum } from '../repository/enums/credit.enum';
+import { CreditStatusEnum } from '../repository/enums/credit.enum';
 import { TermTypeEnum } from '../repository/enums/term.enum copy';
 
 export class CreditDTO {
@@ -34,7 +33,7 @@ export class CreditDTO {
 
   @IsString()
   @IsNotEmpty()
-  status: ContractStatusEnum;
+  status: CreditStatusEnum;
 
   @IsString()
   @IsNotEmpty()
@@ -45,9 +44,6 @@ export class CreditDTO {
 
   @IsNumber() //Dia de pago
   paymentDay: number;
-
-  @IsNumber()
-  regularPayment: number;
 
   @IsNumber()
   totalDebt: number;

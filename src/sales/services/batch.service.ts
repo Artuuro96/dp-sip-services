@@ -57,7 +57,7 @@ export class BatchService {
    * @description Find all the batch paginated
    * @returns {PaginateResult} Object with the batch paginate
    */
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult> {
+  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Batch>> {
     skip = Number(skip);
     limit = Number(limit);
     const options = {

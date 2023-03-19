@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
-import { ContractStatusEnum } from 'src/orders/repository/enums/contract.enum';
-//import { CreditStatusEnum } from '../enums/credit.enum';
+import { CreditStatusEnum } from '../enums/credit.enum';
 import { TermTypeEnum } from '../enums/term.enum copy';
 import { Base } from './base';
 
@@ -33,7 +32,7 @@ export class Credit extends Base {
   endDate: Date;
 
   @Prop()
-  status: ContractStatusEnum;
+  status: CreditStatusEnum;
 
   @Prop()
   termType: TermTypeEnum;
@@ -62,9 +61,25 @@ export class Credit extends Base {
   @Prop()
   totalPayments?: number;
 
-  constructor(Credit: Partial<Credit> = {}) {
+  isAssigned(): boolean {
+    return this.status === CreditStatusEnum.ASSIGNED;
+  }
+
+  isFinished(): boolean {
+    return this.status === CreditStatusEnum.FINISHED;
+  }
+
+  isCancelled(): boolean {
+    return this.status === CreditStatusEnum.CANCELLED;
+  }
+
+  hasBeenSettled(): boolean {
+    return this.currentBalance === 0;
+  }
+
+  constructor(credit: Partial<Credit> = {}) {
     super();
-    Object.assign(this, Credit);
+    Object.assign(this, credit);
   }
 }
 

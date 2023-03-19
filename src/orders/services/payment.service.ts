@@ -1,7 +1,7 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Logger } from 'nestjs-pino';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { Context } from 'src/auth/context/execution-ctx';
 import { PaginateResult } from 'src/interfaces/paginate-result.interface';
+import { CreditStatusEnum } from 'src/sales/repository/enums/credit.enum';
 import { CreditRepository } from 'src/sales/repository/repositories/credit.repository';
 import { PaymentDTO } from '../dtos/payment.dto';
 import { CustomerRepository } from '../repository/repositories/customer.repository';
@@ -17,11 +17,15 @@ export class PaymentService {
     private logger: Logger,
   ) {}
 
-  async create(executionCtx: Context, paymentDTO: PaymentDTO): Promise<any> {
+  async create(executionCtx: Context, paymentDTO: PaymentDTO): Promise<Payment> {
     const credit = await this.creditRepository.findById(paymentDTO.creditId);
 
     if (!credit) {
       throw new NotFoundException(`Credit not found ${paymentDTO.creditId}`);
+    }
+
+    if (credit.status === CreditStatusEnum.FINISHED) {
+      throw new ConflictException(`Credit ${paymentDTO.creditId} has been finished`);
     }
 
     if (paymentDTO.customerId === credit.customerId) {
@@ -51,8 +55,14 @@ export class PaymentService {
     const payment = await this.paymentRepository.create(newPayment);
 
     credit.paymentIds.push(payment._id.toString());
-    credit.currentBalance = credit.currentBalance - (payment.quantity + payment.advance);
+    credit.currentBalance = Number((credit.currentBalance - (payment.quantity + payment.advance)).toFixed(4));
     credit.totalPayments = credit.totalPayments - 1;
+
+    const hasBeenSettled = credit.currentBalance <= 0.001;
+
+    if (hasBeenSettled) {
+      credit.status = CreditStatusEnum.FINISHED;
+    }
 
     await this.creditRepository.updateOne(credit);
 
