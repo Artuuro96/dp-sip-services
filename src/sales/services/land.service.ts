@@ -163,8 +163,11 @@ export class LandService {
     const main = workbook.SheetNames[0];
     const sheetOne = workbook.Sheets[main];
     const dataSheetOne = XLSX.utils.sheet_to_json(sheetOne);
+    dataSheetOne.shift();
     const successfulLandsObj: object[] = [];
     const errorLandsObj: object[] = [];
+
+    const batchesInStorage: Batch[] = [];
 
     for (const [index, landDataToCreate] of dataSheetOne.entries()) {
       const defaultName = `${landDataToCreate['__EMPTY_1']} - ${index}`;
@@ -191,12 +194,20 @@ export class LandService {
         address: addressCreate,
         createdBy: executionCtx.userId,
       };
+      const batchCreate: Batch = {
+        name: landDataToCreate['__EMPTY_3'] ? landDataToCreate['__EMPTY_3'] : 'EMPTY',
+        geofence: [],
+        totalSize: landDataToCreate['__EMPTY_8'],
+        createdBy: executionCtx.userId,
+        landIds: [],
+      };
 
       const validateValuesAddress = Object.values(addressCreate).includes('EMPTY');
       const validateValuesLand = Object.values(landCreate).includes('EMPTY');
       if (validateValuesAddress || validateValuesLand) {
         defaultErrorObjectLand.error = 'Missing fields or wrong order';
         errorLandsObj.push(defaultErrorObjectLand);
+        continue;
       }
 
       const landFound = await this.landRepository.findOne({
@@ -207,6 +218,36 @@ export class LandService {
       if (!isNil(landFound)) {
         defaultErrorObjectLand.error = 'Already exists';
         errorLandsObj.push(defaultErrorObjectLand);
+        continue;
+      }
+
+      let updateBatch = false;
+      let batchCreatedFound: Batch;
+
+      batchCreatedFound = batchesInStorage.find((batchStorage) => batchStorage.name === batchCreate.name);
+      if (batchCreatedFound && batchCreate.name !== 'EMPTY') {
+        landCreate.batchId = batchCreatedFound._id.toString();
+        updateBatch = true;
+      } else if (batchCreate.name !== 'EMPTY') {
+        batchCreatedFound = await this.batchRepository.findOne({
+          name: batchCreate.name,
+        });
+        if (batchCreatedFound) {
+          landCreate.batchId = batchCreatedFound._id.toString();
+          batchesInStorage.push(batchCreatedFound);
+          updateBatch = true;
+        } else {
+          batchCreatedFound = await this.batchRepository.create(batchCreate);
+          if (!isNil(batchCreatedFound) && !isNil(batchCreatedFound._id)) {
+            landCreate.batchId = batchCreatedFound._id.toString();
+            batchesInStorage.push(batchCreatedFound);
+            updateBatch = true;
+          } else {
+            defaultErrorObjectLand.error = 'Error Creating It';
+            errorLandsObj.push(defaultErrorObjectLand);
+            continue;
+          }
+        }
       }
 
       const landCreated = await this.landRepository.create(landCreate);
@@ -214,6 +255,10 @@ export class LandService {
       if (!isNil(landCreated) && !isNil(landCreated._id)) {
         defaultSuccessObjectLand.id = landCreated._id.toString();
         successfulLandsObj.push(defaultSuccessObjectLand);
+        if (updateBatch) {
+          batchCreatedFound.landIds = [...batchCreatedFound.landIds, landCreated._id.toString()];
+          await this.batchRepository.updateOne(batchCreatedFound);
+        }
       } else {
         defaultErrorObjectLand.error = 'Error Creating It';
         errorLandsObj.push(defaultErrorObjectLand);
