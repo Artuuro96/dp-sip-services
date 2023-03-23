@@ -2,13 +2,22 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CustomerDTO } from '../dtos/customer.dto';
 import { CustomerRepository } from '../repository/repositories/customer.repository';
 import { Address, Customer } from '../repository/schemas/customer.schema';
-import { isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { Context } from 'src/auth/context/execution-ctx';
+import { CreditRepository } from 'src/sales/repository/repositories/credit.repository';
+import { CustomerProfileDTO } from 'src/sales/dtos/customer-profile.dto';
+import { PaymentRepository } from '../repository/repositories/payment.repository';
+import { AcmaClient } from 'src/client/acma.client';
 
 @Injectable()
 export class CustomerService {
-  constructor(private customerRepository: CustomerRepository) {}
+  constructor(
+    private customerRepository: CustomerRepository,
+    private creditRepository: CreditRepository,
+    private paymentRepository: PaymentRepository,
+    private acmaClient: AcmaClient,
+  ) {}
 
   /**
    * @name create
@@ -49,6 +58,57 @@ export class CustomerService {
     if (isNil(customerFound)) throw new NotFoundException('Customer not found');
     if (customerFound.deleted) throw new NotFoundException('Customer not found');
     return customerFound;
+  }
+
+  async findProfile(customerId): Promise<any> {
+    const customerFound = await this.customerRepository.findById(customerId);
+    if (isNil(customerFound)) {
+      throw new NotFoundException(`Customer ${customerId} not found`);
+    }
+
+    const findOptions = {
+      query: {
+        customerId,
+      },
+      projection: {
+        paymentIds: 1,
+        creditNumber: 1,
+        startDate: 1,
+        endDate: 1,
+        currentBalance: 1,
+        regularPayment: 1,
+        paymentDay: 1,
+        totalDebt: 1,
+      },
+    };
+    const credit = await this.creditRepository.find(findOptions);
+
+    if (isEmpty(credit)) {
+      throw new NotFoundException(`Credit not found for ${customerId}`);
+    }
+
+    if (isEmpty(credit[0].paymentIds)) {
+      return new CustomerProfileDTO(credit[0], customerFound, []);
+    }
+
+    const findPaymentOptions = {
+      query: {
+        _id: {
+          $in: credit[0].paymentIds,
+        },
+      },
+      projection: {
+        advance: 1,
+        quantity: 1,
+        createdBy: 1,
+        _id: 1,
+        createdAt: 1,
+      },
+    };
+
+    const payments = await this.paymentRepository.find(findPaymentOptions);
+
+    return new CustomerProfileDTO(credit[0], customerFound, payments);
   }
 
   /**

@@ -32,4 +32,24 @@ export class AcmaClient {
       throw error;
     }
   }
+
+  async findUserById(id: string, token: string): Promise<any> {
+    const axiosConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    try {
+      const response = await this.acmaAxios.post<AuthResponse>(`/user/${id}`, { token }, axiosConfig);
+      return response.data;
+    } catch (error) {
+      if (error?.response?.status === HttpStatus.UNAUTHORIZED) {
+        throw new UnauthorizedException(error.message);
+      }
+      if (error?.response?.status === HttpStatus.NOT_FOUND) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
+  }
 }

@@ -22,6 +22,11 @@ export class CustomerController {
     return this.customerService.create(executionCtx, customer);
   }
 
+  @Get('/profile/:customerId')
+  async findProfile(@Param('customerId') customerId: string): Promise<any> {
+    return this.customerService.findProfile(customerId);
+  }
+
   @Get('/:customerId')
   async findById(@Param('customerId') customerId: string): Promise<Customer> {
     return this.customerService.findById(customerId);

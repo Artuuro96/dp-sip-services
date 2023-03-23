@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsEmail, IsString, IsUrl, IsObject, IsOptional, ValidateNested, IsNumber } from 'class-validator';
+import { IsEmail, IsString, IsUrl, IsObject, IsOptional, ValidateNested, IsDefined } from 'class-validator';
+import { GenderEnum } from '../repository/enums/gender.enum';
 import { AddressDTO } from './address.dto';
 
 export class CustomerDTO {
@@ -16,11 +17,13 @@ export class CustomerDTO {
   @IsEmail()
   email: string;
 
-  @IsNumber()
-  cellPhone: number;
+  @IsString()
+  @IsDefined()
+  cellPhone: string;
 
-  @IsNumber()
-  phone: number;
+  @IsString()
+  @IsOptional()
+  phone?: string;
 
   @IsString()
   rfc: string;
@@ -38,8 +41,9 @@ export class CustomerDTO {
 
   @IsString()
   @IsOptional()
-  gender?: string;
+  gender?: GenderEnum;
 
   @IsUrl()
-  avatar: string;
+  @IsOptional()
+  avatar?: string;
 }

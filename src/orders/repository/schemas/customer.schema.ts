@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
 import { BehaviourEnum } from '../enums/behaviour.enum';
+import { GenderEnum } from '../enums/gender.enum';
 import { Base } from './base';
 
 export type CustomerDocument = HydratedDocument<Customer>;
@@ -47,10 +48,10 @@ export class Customer extends Base {
   email: string;
 
   @Prop()
-  cellPhone: number;
+  cellPhone: string;
 
   @Prop()
-  phone?: number;
+  phone?: string;
 
   @Prop({ required: true })
   rfc: string;
@@ -67,10 +68,10 @@ export class Customer extends Base {
   birthday: Date;
 
   @Prop()
-  gender?: string;
+  gender?: GenderEnum;
 
   @Prop()
-  avatar: string;
+  avatar?: string;
 
   @Prop({ default: 10 })
   creditPoints?: number;
