@@ -22,6 +22,9 @@ export class Contract extends Base {
   @Prop()
   sellerId: string;
 
+  @Prop()
+  landName: string;
+
   @Prop({ type: SchemaTypes.ObjectId })
   customerId?: string;
 

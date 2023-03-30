@@ -63,17 +63,19 @@ export class LandService {
    * @description Find all the land paginated
    * @returns {PaginateResult} Object with the land paginate
    */
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Land>> {
+  async findAll(keyValue = '', skip = 0, limit = 10): Promise<PaginateResult<Land>> {
     skip = Number(skip);
     limit = Number(limit);
+    const page = skip > 0 ? skip - 1 : skip;
     const options = {
       skip: skip > 0 ? skip - 1 : skip,
       limit,
     };
-
+    options.skip = options.skip * limit;
     //need to find the way of doing a variable search
     const query = {
       name: new RegExp(`${keyValue}`, 'i'),
+      deleted: false,
     };
 
     const lands = await this.landRepository.find({ query, options });
@@ -81,7 +83,7 @@ export class LandService {
     return {
       result: lands,
       total: countLands,
-      page: skip !== 0 ? 1 : skip,
+      page: page === 0 ? 1 : page,
       pages: Math.ceil(countLands / limit) || 0,
     };
   }
