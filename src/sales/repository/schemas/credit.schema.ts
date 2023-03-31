@@ -23,9 +23,6 @@ export class Credit extends Base {
   batchId?: string;
 
   @Prop()
-  creditNumber: string;
-
-  @Prop()
   startDate: Date;
 
   @Prop()

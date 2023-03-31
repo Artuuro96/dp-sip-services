@@ -56,7 +56,6 @@ export class ContractService {
 
     const newContract = {
       ...contract,
-      contractNumber: uuidv4(),
       sellerId: !isNil(contract.sellerId) ? contract.sellerId : executionCtx.userId,
       status: status,
       createdBy: executionCtx.userId,

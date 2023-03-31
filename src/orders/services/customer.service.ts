@@ -72,7 +72,6 @@ export class CustomerService {
       },
       projection: {
         paymentIds: 1,
-        creditNumber: 1,
         startDate: 1,
         endDate: 1,
         currentBalance: 1,
