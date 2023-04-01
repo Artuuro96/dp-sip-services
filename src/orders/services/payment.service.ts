@@ -3,6 +3,7 @@ import { Context } from 'src/auth/context/execution-ctx';
 import { PaginateResult } from 'src/interfaces/paginate-result.interface';
 import { CreditStatusEnum } from 'src/sales/repository/enums/credit.enum';
 import { CreditRepository } from 'src/sales/repository/repositories/credit.repository';
+import { Credit } from 'src/sales/repository/schemas/credit.schema';
 import { PaymentDTO } from '../dtos/payment.dto';
 import { CustomerRepository } from '../repository/repositories/customer.repository';
 import { PaymentRepository } from '../repository/repositories/payment.repository';
@@ -41,22 +42,33 @@ export class PaymentService {
     newPayment.paymentDate = new Date();
     newPayment.advance = paymentDTO.advance || 0;
     newPayment.quantity = paymentDTO.quantity;
+    newPayment.sequence = credit.paymentIds.length + 1;
+
+    // if (paymentDTO.quantity < credit.nextPayment) increase total doubt when we have the interest
 
     if (!newPayment.isOnTime(credit.paymentDay)) {
-      const creditPoints = await this.customerRepository.findById(paymentDTO.customerId, { creditPoints: 1 });
+      const customer = await this.customerRepository.findById(paymentDTO.customerId, {
+        creditPoints: 1,
+      });
+
+      if (!customer) {
+        throw new NotFoundException(`Customer ${paymentDTO.customerId} not found`);
+      }
+
       await this.customerRepository.updateOne({
         updatedBy: executionCtx.userId,
-        creditPoints: Number(creditPoints) - 1,
+        creditPoints: Number(customer.creditPoints) - 1,
       });
     }
 
     const payment = await this.paymentRepository.create(newPayment);
 
     credit.paymentIds.push(payment._id.toString());
-    credit.currentBalance = Number((credit.currentBalance - (payment.quantity + payment.advance)).toFixed(4));
+    credit.currentBalance = Number((credit.currentBalance - (payment.quantity + payment.advance)).toFixed(2));
     credit.totalPayments = credit.totalPayments - 1;
+    credit.nextPayment = this.calculateNextPayment(credit, payment);
 
-    const hasBeenSettled = credit.currentBalance <= 0.001;
+    const hasBeenSettled = credit.currentBalance === 0;
 
     if (hasBeenSettled) {
       credit.status = CreditStatusEnum.FINISHED;
@@ -92,5 +104,17 @@ export class PaymentService {
 
   async findById(paymentId: string): Promise<Payment> {
     return await this.paymentRepository.findById(paymentId);
+  }
+
+  private calculateNextPayment(credit: Credit, payment: Payment): number {
+    if (payment.sequence === credit.termQuantity - 1) {
+      return credit.currentBalance;
+    }
+
+    if (payment.sequence === credit.termQuantity) {
+      return credit.currentBalance;
+    }
+
+    return credit.regularPayment;
   }
 }

@@ -31,6 +31,9 @@ export class Payment extends Base {
   @Prop()
   invoice?: ContractStatusEnum;
 
+  @Prop()
+  sequence?: number;
+
   isOnTime(paymentDay: number): boolean {
     return new Date() <= getCurrentPaymentDate(paymentDay);
   }

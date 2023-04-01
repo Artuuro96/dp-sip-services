@@ -21,10 +21,6 @@ export class CreditDTO {
 
   @IsString()
   @IsNotEmpty()
-  creditNumber: string;
-
-  @IsString()
-  @IsNotEmpty()
   startDate: string;
 
   @IsString()

@@ -33,7 +33,7 @@ export class CreditService {
       paymentIds: [],
       createdBy: executionCtx.userId,
       currentBalance: credit.totalDebt,
-      regularPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(4)),
+      regularPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(2)),
     });
 
     const creditCreated = await this.creditRepository.create(newCredit);

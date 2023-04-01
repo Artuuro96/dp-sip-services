@@ -9,6 +9,7 @@ import { CreditRepository } from 'src/sales/repository/repositories/credit.repos
 import { CustomerProfileDTO } from 'src/sales/dtos/customer-profile.dto';
 import { PaymentRepository } from '../repository/repositories/payment.repository';
 import { AcmaClient } from 'src/client/acma.client';
+import { Credit } from 'src/sales/repository/schemas/credit.schema';
 
 @Injectable()
 export class CustomerService {
@@ -72,19 +73,21 @@ export class CustomerService {
       },
       projection: {
         paymentIds: 1,
-        creditNumber: 1,
         startDate: 1,
         endDate: 1,
         currentBalance: 1,
         regularPayment: 1,
         paymentDay: 1,
+        nextPayment: 1,
+        termQuantity: 1,
         totalDebt: 1,
+        landId: 1,
       },
     };
     const credit = await this.creditRepository.find(findOptions);
 
     if (isEmpty(credit)) {
-      throw new NotFoundException(`Credit not found for ${customerId}`);
+      return new CustomerProfileDTO({} as Credit, customerFound, []);
     }
 
     if (isEmpty(credit[0].paymentIds)) {
@@ -101,6 +104,7 @@ export class CustomerService {
         advance: 1,
         quantity: 1,
         createdBy: 1,
+        sequence: 1,
         _id: 1,
         createdAt: 1,
       },
