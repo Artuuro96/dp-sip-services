@@ -123,15 +123,18 @@ export class CustomerService {
    * @description Find all the customer paginated
    * @returns {PaginateResult} Object with the customer paginate
    */
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Customer>> {
+  async findAll(keyValue = '', skip = 0, limit = 10): Promise<PaginateResult<Customer>> {
     skip = Number(skip);
     limit = Number(limit);
+    const page = skip > 0 ? skip - 1 : skip;
     const options = {
       skip: skip > 0 ? skip - 1 : skip,
       limit,
     };
+    options.skip = options.skip * limit;
     const query = {
       name: new RegExp(`${keyValue}`, 'i'),
+      deleted: false,
     };
 
     const customers = await this.customerRepository.find({ query, options });
@@ -139,7 +142,7 @@ export class CustomerService {
     return {
       result: customers,
       total: countCustomers,
-      page: skip !== 0 ? 1 : skip,
+      page: page === 0 ? 1 : page,
       pages: Math.ceil(countCustomers / limit) || 0,
     };
   }

@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ContractDTO } from '../dtos/contract.dto';
 import { Contract } from '../repository/schemas/contract.schema';
+import { Customer } from '../repository/schemas/customer.schema';
 import { ContractRepository } from '../repository/repositories/contract.repository';
+import { CustomerRepository } from '../repository/repositories/customer.repository';
 import { LandRepository } from '../../sales/repository/repositories/land.repository';
 import { BatchRepository } from '../../sales/repository/repositories/batch.repository';
 import { Batch } from 'src/sales/repository/schemas/batch.schema';
@@ -12,6 +14,8 @@ import { LandService } from '../../sales/services/land.service';
 import { Context } from 'src/auth/context/execution-ctx';
 import { v4 as uuidv4 } from 'uuid';
 import { PaginateResult } from '../../interfaces/paginate-result.interface';
+import { CreditRepository } from '../../sales/repository/repositories/credit.repository';
+import { Credit } from '../../sales/repository/schemas/credit.schema';
 
 @Injectable()
 export class ContractService {
@@ -20,6 +24,8 @@ export class ContractService {
     private contractRepository: ContractRepository,
     private landRepository: LandRepository,
     private landService: LandService,
+    private creditRepository: CreditRepository,
+    private customerRepository: CustomerRepository,
   ) {}
 
   async createForLand(executionCtx: Context, contract: ContractDTO): Promise<Contract> {
@@ -27,6 +33,7 @@ export class ContractService {
     const land = await this.landRepository.findById(contract.landId, {
       _id: 1,
       batchId: 1,
+      name: 1,
       available: 1,
       deleted: 1,
     });
@@ -49,10 +56,10 @@ export class ContractService {
 
     const newContract = {
       ...contract,
-      contractNumber: uuidv4(),
       sellerId: !isNil(contract.sellerId) ? contract.sellerId : executionCtx.userId,
       status: status,
       createdBy: executionCtx.userId,
+      landName: land.name,
     };
     const contractCreated = await this.contractRepository.create(newContract);
 
@@ -76,23 +83,79 @@ export class ContractService {
     return contractFound;
   }
 
-  async findAll(keyValue = '', skip = 0, limit?: number): Promise<PaginateResult<Contract>> {
+  async findAll(keyValue = '', skip = 0, limit = 10): Promise<PaginateResult<Contract>> {
     skip = Number(skip);
     limit = Number(limit);
+    const page = skip > 0 ? skip - 1 : skip;
     const options = {
       skip: skip > 0 ? skip - 1 : skip,
       limit,
     };
+    options.skip = options.skip * limit;
     const query = {
       name: new RegExp(`${keyValue}`, 'i'),
+      deleted: false,
     };
 
+    const creditsId: string[] = [];
+    const customersId: string[] = [];
     const contracts = await this.contractRepository.find({ query, options });
+    contracts.forEach((contract: Contract) => {
+      if (!isNil(contract.creditId)) {
+        creditsId.push(contract.creditId.toString());
+      }
+      if (!isNil(contract.customerId)) {
+        customersId.push(contract.customerId.toString());
+      }
+    });
+
+    let credits: Credit[] = [];
+    if (creditsId.length > 0) {
+      credits = await this.creditRepository.find({
+        query: {
+          _id: {
+            $in: creditsId,
+          },
+        },
+      });
+    }
+
+    let customers: Customer[] = [];
+    if (customersId.length > 0) {
+      customers = await this.customerRepository.find({
+        query: {
+          _id: {
+            $in: customersId,
+          },
+        },
+        projection: {
+          name: 1,
+        },
+      });
+    }
+
+    const resultsToReturn = [];
+
+    contracts.forEach((contract) => {
+      const credit = credits.find((credit) => credit._id.toString() === contract.creditId?.toString());
+      const customer = customers.find(
+        (customer) => customer._id.toString() === contract.customerId?.toString(),
+      );
+
+      const resultObj = {
+        contract,
+        credit: credit ? credit : {},
+        customer: customer ? customer : {},
+      };
+
+      resultsToReturn.push(resultObj);
+    });
+
     const countContracts = await this.contractRepository.count(query);
     return {
-      result: contracts,
+      result: resultsToReturn,
       total: countContracts,
-      page: skip !== 0 ? 1 : skip,
+      page: page === 0 ? 1 : page,
       pages: Math.ceil(countContracts / limit) || 0,
     };
   }

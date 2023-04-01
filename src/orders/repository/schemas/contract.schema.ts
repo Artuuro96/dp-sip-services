@@ -11,9 +11,6 @@ export class Contract extends Base {
   _id?: Types.ObjectId;
 
   @Prop()
-  contractNumber: string;
-
-  @Prop()
   paymentType: PaymentTypeEnum;
 
   @Prop({ type: SchemaTypes.ObjectId })
@@ -21,6 +18,9 @@ export class Contract extends Base {
 
   @Prop()
   sellerId: string;
+
+  @Prop()
+  landName: string;
 
   @Prop({ type: SchemaTypes.ObjectId })
   customerId?: string;
