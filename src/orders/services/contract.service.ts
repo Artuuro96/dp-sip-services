@@ -93,7 +93,7 @@ export class ContractService {
     };
     options.skip = options.skip * limit;
     const query = {
-      name: new RegExp(`${keyValue}`, 'i'),
+      nameLand: new RegExp(`${keyValue}`, 'i'),
       deleted: false,
     };
 
