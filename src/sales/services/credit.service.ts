@@ -34,6 +34,7 @@ export class CreditService {
       createdBy: executionCtx.userId,
       currentBalance: credit.totalDebt,
       regularPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(2)),
+      nextPayment: Number((credit.totalDebt / credit.termQuantity).toFixed(2)),
     });
 
     const creditCreated = await this.creditRepository.create(newCredit);
@@ -71,6 +72,19 @@ export class CreditService {
       total: countCredits,
       page: skip !== 0 ? 1 : skip,
       pages: Math.ceil(countCredits / limit) || 0,
+    };
+  }
+
+  async findIdsByCustomerId(customerId: string): Promise<{ creditIds: string[] }> {
+    const findOptions = {
+      query: {
+        customerId,
+      },
+    };
+
+    const credits = await this.creditRepository.find(findOptions);
+    return {
+      creditIds: credits.map((credit) => credit._id.toString()),
     };
   }
 }

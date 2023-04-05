@@ -7,6 +7,7 @@ import { CustomerService } from '../services/customer.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ExecutionCtx } from 'src/auth/decorators/execution-ctx.decorator';
 import { Context } from 'src/auth/context/execution-ctx';
+import { CustomerProfileDTO } from 'src/sales/dtos/customer-profile.dto';
 
 @UseGuards(AuthGuard)
 @Controller('customers')
@@ -22,9 +23,12 @@ export class CustomerController {
     return this.customerService.create(executionCtx, customer);
   }
 
-  @Get('/profile/:customerId')
-  async findProfile(@Param('customerId') customerId: string): Promise<any> {
-    return this.customerService.findProfile(customerId);
+  @Get('/profile/:customerId/credit/:creditId')
+  async findProfile(
+    @Param('customerId') customerId: string,
+    @Param('creditId') creditId: string,
+  ): Promise<CustomerProfileDTO> {
+    return this.customerService.findProfile(customerId, creditId);
   }
 
   @Get('/:customerId')

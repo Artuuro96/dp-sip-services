@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PaginateResult } from '../../interfaces/paginate-result.interface';
 import { CreditRepository } from '../../sales/repository/repositories/credit.repository';
 import { Credit } from '../../sales/repository/schemas/credit.schema';
+import { LandStatusEnum } from 'src/sales/repository/enums/land.enum';
 
 @Injectable()
 export class ContractService {
@@ -67,6 +68,7 @@ export class ContractService {
     const landUpdate = {
       _id: land._id,
       available: false,
+      status: LandStatusEnum.SELLED,
     };
 
     await this.landRepository.updateOne(landUpdate);

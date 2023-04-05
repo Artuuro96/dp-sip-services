@@ -61,43 +61,23 @@ export class CustomerService {
     return customerFound;
   }
 
-  async findProfile(customerId): Promise<any> {
+  async findProfile(customerId: string, creditId: string): Promise<any> {
     const customerFound = await this.customerRepository.findById(customerId);
+
     if (isNil(customerFound)) {
       throw new NotFoundException(`Customer ${customerId} not found`);
     }
 
-    const findOptions = {
-      query: {
-        customerId,
-      },
-      projection: {
-        paymentIds: 1,
-        startDate: 1,
-        endDate: 1,
-        currentBalance: 1,
-        regularPayment: 1,
-        paymentDay: 1,
-        nextPayment: 1,
-        termQuantity: 1,
-        totalDebt: 1,
-        landId: 1,
-      },
-    };
-    const credit = await this.creditRepository.find(findOptions);
+    const credit = await this.creditRepository.findById(creditId);
 
-    if (isEmpty(credit)) {
-      return new CustomerProfileDTO({} as Credit, customerFound, []);
-    }
-
-    if (isEmpty(credit[0].paymentIds)) {
-      return new CustomerProfileDTO(credit[0], customerFound, []);
+    if (!credit) {
+      return new CustomerProfileDTO(customerFound, {} as Credit, []);
     }
 
     const findPaymentOptions = {
       query: {
         _id: {
-          $in: credit[0].paymentIds,
+          $in: credit.paymentIds,
         },
       },
       projection: {
@@ -112,7 +92,7 @@ export class CustomerService {
 
     const payments = await this.paymentRepository.find(findPaymentOptions);
 
-    return new CustomerProfileDTO(credit[0], customerFound, payments);
+    return new CustomerProfileDTO(customerFound, credit, payments);
   }
 
   /**

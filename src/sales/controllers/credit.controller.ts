@@ -27,4 +27,9 @@ export class CreditController {
   async findAll(@Query() { skip, limit, keyValue }: PaginationParamsDTO): Promise<PaginateResult<Credit>> {
     return this.creditService.findAll(keyValue, skip, limit);
   }
+
+  @Get('customer/:customerId')
+  async findIdsByCustomerId(@Param('customerId') customerId: string): Promise<{ creditIds: string[] }> {
+    return await this.creditService.findIdsByCustomerId(customerId);
+  }
 }

@@ -7,7 +7,7 @@ export class CustomerProfileDTO {
   credit: Credit;
   payments: Payment[];
 
-  constructor(credit: Credit, customer: Customer, payments: Payment[]) {
+  constructor(customer: Customer, credit: Credit, payments: Payment[]) {
     Object.assign(this, {
       customer,
       credit,

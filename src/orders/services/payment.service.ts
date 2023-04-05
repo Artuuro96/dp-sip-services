@@ -63,9 +63,13 @@ export class PaymentService {
 
     const payment = await this.paymentRepository.create(newPayment);
 
+    if (paymentDTO.advance) {
+      credit.currentBalance = Number((credit.currentBalance - paymentDTO.advance).toFixed(2));
+      credit.regularPayment = this.recalculateRegularPayment(credit);
+    }
     credit.paymentIds.push(payment._id.toString());
-    credit.currentBalance = Number((credit.currentBalance - (payment.quantity + payment.advance)).toFixed(2));
-    credit.totalPayments = credit.totalPayments - 1;
+    credit.currentBalance = Number((credit.currentBalance - payment.quantity).toFixed(2));
+    credit.termQuantity = credit.termQuantity - 1;
     credit.nextPayment = this.calculateNextPayment(credit, payment);
 
     const hasBeenSettled = credit.currentBalance === 0;
@@ -107,6 +111,12 @@ export class PaymentService {
   }
 
   private calculateNextPayment(credit: Credit, payment: Payment): number {
+    if (payment.quantity < credit.regularPayment) {
+      //increase interests
+      const remaining = credit.regularPayment - payment.quantity;
+      return credit.nextPayment + remaining; // plus interest
+    }
+
     if (payment.sequence === credit.termQuantity - 1) {
       return credit.currentBalance;
     }
@@ -116,5 +126,11 @@ export class PaymentService {
     }
 
     return credit.regularPayment;
+  }
+
+  recalculateRegularPayment(credit: Credit): number {
+    const remainingPayments = credit.termQuantity - credit.paymentIds.length;
+    const regularPayment = Number((credit.currentBalance / remainingPayments).toFixed(2));
+    return regularPayment;
   }
 }
