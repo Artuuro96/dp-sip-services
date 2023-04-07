@@ -23,19 +23,19 @@ export class LandRepository {
   }
 
   async count(query): Promise<number> {
-    return this.landModel.count(query);
+    return await this.landModel.count(query);
   }
 
   async findById(landId, projection?): Promise<Land> {
-    return this.landModel.findById(landId, projection);
+    return await this.landModel.findById(landId, projection);
   }
 
   async findOne(query, projection?): Promise<Land> {
-    return this.landModel.findOne(query, projection);
+    return await this.landModel.findOne(query, projection);
   }
 
   async updateOne(land): Promise<Land> {
-    return this.landModel.findOneAndUpdate({ _id: land._id }, land, {
+    return await this.landModel.findOneAndUpdate({ _id: land._id }, land, {
       new: true,
     });
   }

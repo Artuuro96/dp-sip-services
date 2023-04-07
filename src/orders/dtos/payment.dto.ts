@@ -4,9 +4,6 @@ export class PaymentDTO {
   @IsNumber()
   quantity: number;
 
-  @IsNumber()
-  advance: number;
-
   @IsString()
   creditId: string;
 

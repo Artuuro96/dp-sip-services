@@ -2,7 +2,9 @@ import { ConflictException, ForbiddenException, Injectable, NotFoundException } 
 import { Context } from 'src/auth/context/execution-ctx';
 import { PaginateResult } from 'src/interfaces/paginate-result.interface';
 import { CreditStatusEnum } from 'src/sales/repository/enums/credit.enum';
+import { LandStatusEnum } from 'src/sales/repository/enums/land.enum';
 import { CreditRepository } from 'src/sales/repository/repositories/credit.repository';
+import { LandRepository } from 'src/sales/repository/repositories/land.repository';
 import { Credit } from 'src/sales/repository/schemas/credit.schema';
 import { PaymentDTO } from '../dtos/payment.dto';
 import { CustomerRepository } from '../repository/repositories/customer.repository';
@@ -15,10 +17,12 @@ export class PaymentService {
     private paymentRepository: PaymentRepository,
     private creditRepository: CreditRepository,
     private customerRepository: CustomerRepository,
+    private landRepository: LandRepository,
   ) {}
 
   async create(executionCtx: Context, paymentDTO: PaymentDTO): Promise<Payment> {
     const credit = await this.creditRepository.findById(paymentDTO.creditId);
+    const totalPayable = credit.nextPayment;
 
     if (!credit) {
       throw new NotFoundException(`Credit not found ${paymentDTO.creditId}`);
@@ -40,11 +44,7 @@ export class PaymentService {
     newPayment.createdBy = executionCtx.userId;
     newPayment.creditId = paymentDTO.creditId;
     newPayment.paymentDate = new Date();
-    newPayment.advance = paymentDTO.advance || 0;
-    newPayment.quantity = paymentDTO.quantity;
     newPayment.sequence = credit.paymentIds.length + 1;
-
-    // if (paymentDTO.quantity < credit.nextPayment) increase total doubt when we have the interest
 
     if (!newPayment.isOnTime(credit.paymentDay)) {
       const customer = await this.customerRepository.findById(paymentDTO.customerId, {
@@ -61,21 +61,45 @@ export class PaymentService {
       });
     }
 
+    if (paymentDTO.quantity < totalPayable) {
+      const remaining = credit.regularPayment - paymentDTO.quantity;
+      credit.currentBalance = Number((credit.currentBalance - paymentDTO.quantity).toFixed(2));
+      credit.nextPayment = credit.regularPayment + remaining;
+      newPayment.quantity = paymentDTO.quantity;
+      newPayment.advance = 0;
+    }
+
+    if (paymentDTO.quantity > totalPayable) {
+      const advance = paymentDTO.quantity - credit.regularPayment;
+      credit.currentBalance = Number((credit.currentBalance - credit.regularPayment).toFixed(2));
+      credit.currentBalance = Number((credit.currentBalance - advance).toFixed(2));
+      const remainingPayments = credit.termQuantity - credit.paymentIds.length - 1;
+      credit.regularPayment = Number((credit.currentBalance / remainingPayments).toFixed(2));
+      credit.nextPayment = credit.regularPayment;
+      newPayment.quantity = totalPayable;
+      newPayment.advance = advance;
+    }
+
+    if (paymentDTO.quantity === totalPayable) {
+      credit.currentBalance = Number((credit.currentBalance - paymentDTO.quantity).toFixed(2));
+      credit.nextPayment = credit.regularPayment;
+      newPayment.quantity = paymentDTO.quantity;
+      newPayment.advance = 0;
+    }
+
     const payment = await this.paymentRepository.create(newPayment);
 
-    if (paymentDTO.advance) {
-      credit.currentBalance = Number((credit.currentBalance - paymentDTO.advance).toFixed(2));
-      credit.regularPayment = this.recalculateRegularPayment(credit);
-    }
     credit.paymentIds.push(payment._id.toString());
-    credit.currentBalance = Number((credit.currentBalance - payment.quantity).toFixed(2));
-    credit.termQuantity = credit.termQuantity - 1;
-    credit.nextPayment = this.calculateNextPayment(credit, payment);
 
     const hasBeenSettled = credit.currentBalance === 0;
 
     if (hasBeenSettled) {
+      await this.landRepository.updateOne({
+        _id: credit.landId,
+        status: LandStatusEnum.PAIDOFF,
+      });
       credit.status = CreditStatusEnum.FINISHED;
+      credit.nextPayment = 0;
     }
 
     await this.creditRepository.updateOne(credit);
@@ -108,29 +132,5 @@ export class PaymentService {
 
   async findById(paymentId: string): Promise<Payment> {
     return await this.paymentRepository.findById(paymentId);
-  }
-
-  private calculateNextPayment(credit: Credit, payment: Payment): number {
-    if (payment.quantity < credit.regularPayment) {
-      //increase interests
-      const remaining = credit.regularPayment - payment.quantity;
-      return credit.nextPayment + remaining; // plus interest
-    }
-
-    if (payment.sequence === credit.termQuantity - 1) {
-      return credit.currentBalance;
-    }
-
-    if (payment.sequence === credit.termQuantity) {
-      return credit.currentBalance;
-    }
-
-    return credit.regularPayment;
-  }
-
-  recalculateRegularPayment(credit: Credit): number {
-    const remainingPayments = credit.termQuantity - credit.paymentIds.length;
-    const regularPayment = Number((credit.currentBalance / remainingPayments).toFixed(2));
-    return regularPayment;
   }
 }
