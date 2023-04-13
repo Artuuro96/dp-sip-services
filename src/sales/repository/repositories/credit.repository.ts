@@ -22,7 +22,7 @@ export class CreditRepository {
 
     return creditFind;
   }
-  f;
+
   async count(query): Promise<number> {
     return this.creditModel.count(query);
   }
@@ -35,5 +35,19 @@ export class CreditRepository {
     return this.creditModel.findOneAndUpdate({ _id: credit._id }, credit, {
       new: true,
     });
+  }
+
+  async countSales(): Promise<any> {
+    return this.creditModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: '$totalDebt',
+          },
+          totalSales: { $sum: 1 },
+        },
+      },
+    ]);
   }
 }

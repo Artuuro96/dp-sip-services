@@ -161,4 +161,8 @@ export class ContractService {
       pages: Math.ceil(countContracts / limit) || 0,
     };
   }
+
+  async countSales(): Promise<any> {
+    const count = await this.contractRepository.count({});
+  }
 }

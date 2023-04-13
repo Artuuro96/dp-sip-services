@@ -87,4 +87,9 @@ export class CreditService {
       creditIds: credits.map((credit) => credit._id.toString()),
     };
   }
+
+  async countSales(): Promise<any> {
+    const res = await this.creditRepository.countSales();
+    return res;
+  }
 }
