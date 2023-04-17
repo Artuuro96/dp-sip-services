@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:384725178022:task-definition/sip-services-task:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:384725178022:task-definition/sip-services-task:9",
     "containerDefinitions": [
         {
             "name": "sip-services",
@@ -33,7 +33,7 @@
     "family": "sip-services-task",
     "executionRoleArn": "arn:aws:iam::384725178022:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 9,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -76,7 +76,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2023-03-12T20:42:50.834Z",
-    "registeredBy": "arn:aws:iam::384725178022:user/josuers823",
+    "registeredAt": "2023-04-17T15:01:41.201Z",
+    "registeredBy": "arn:aws:iam::384725178022:root",
     "tags": []
 }
