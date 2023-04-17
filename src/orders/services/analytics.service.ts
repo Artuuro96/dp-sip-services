@@ -4,9 +4,7 @@ import { ContractService } from './contract.service';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(
-    private readonly creditService: CreditService,
-  ) {}
+  constructor(private readonly creditService: CreditService) {}
 
   async countSales(countSalesQueryDTO: any): Promise<any> {
     return await this.creditService.countSales();

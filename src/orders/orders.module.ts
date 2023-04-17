@@ -12,9 +12,16 @@ import { PaymentService } from './services/payment.service';
 import { AnalyticsController } from './controllers/analytics.controller';
 import { AnalyticsService } from './services/analytics.service';
 import { CreditService } from 'src/sales/services/credit.service';
+import { HealthCheckController } from './controllers/health-check.controller';
 
 @Module({
-  controllers: [CustomerController, ContractController, PaymentController, AnalyticsController],
+  controllers: [
+    CustomerController,
+    ContractController,
+    PaymentController,
+    AnalyticsController,
+    HealthCheckController,
+  ],
   imports: [RepositoryModule, ClientModule, JwtModule],
   providers: [CustomerService, ContractService, LandService, PaymentService, AnalyticsService, CreditService],
 })
